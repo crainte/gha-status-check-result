@@ -4,7 +4,6 @@ const github = require('@actions/github');
 const token = core.getInput('authToken') || process.env.GITHUB_TOKEN;
 const timeout = core.getInput('timeout') || 30000;
 const interval = core.getInput('interval') || 5000;
-const context = core.getInput('context') || null;
 
 const octokit = github.getOctokit(token);
 const [owner, repo] = github.context.repo;
@@ -62,12 +61,8 @@ async function reqStatus() {
             repo: repo,
             sha: github.context.sha,
         });
-        if (context) {
-            // look for the specific context
-            filtered = response.data;
-        } else {
-            filtered = response.data;
-        }
+        // temp
+        filtered = response.data;
         console.log(filtered);
         return filtered;
     } catch (error) {
