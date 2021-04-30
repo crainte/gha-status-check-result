@@ -6080,11 +6080,11 @@ function monitorStatus() {
 async function reqChecks() {
     try {
         core.info("Requesting Checks");
-        const response = octokit.request("GET {url}/commits/{sha}/check-runs", {
+        const response = await octokit.request("GET {url}/commits/{sha}/check-runs", {
             url: context.payload.repository.url,
             sha: context.sha,
         });
-        const again = octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/check-runs`);
+        const again = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/check-runs`);
         console.log(again);
         console.log("Response");
         console.log(response);
