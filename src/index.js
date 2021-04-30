@@ -36,12 +36,7 @@ function monitorStatus() {
 async function reqChecks() {
     try {
         core.info("Requesting Checks");
-        const response = await octokit.request("GET {url}/commits/{sha}/check-runs", {
-            url: context.payload.repository.url,
-            sha: context.sha,
-        });
-        const again = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/check-runs`);
-        console.log(again);
+        const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/check-runs`);
         console.log("Response");
         console.log(response);
         const filtered = response.data.check_runs.filter( run => run.name !== context.action );
