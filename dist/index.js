@@ -6048,10 +6048,10 @@ const github = __nccwpck_require__(176);
 const token = core.getInput('authToken') || process.env.GITHUB_TOKEN;
 const timeout = core.getInput('timeout') || 30000;
 const interval = core.getInput('interval') || 5000;
-const context = core.getInput('context') || null;
 
 const octokit = github.getOctokit(token);
-const [owner, repo] = github.context.repo;
+const context = github.context;
+const [owner, repo] = context.repo;
 
 function monitorStatus() {
     console.log("Monitoring for checks and status changes");
@@ -6079,9 +6079,9 @@ async function reqChecks() {
         const response = await octokit.request("GET https://api.github.com/repos/{owner}/{repo}/commits/{sha}/check-runs", {
             owner: owner,
             repo: repo,
-            sha: github.context.sha,
+            sha: context.sha,
         });
-        const filtered = response.data.check_runs.filter( run => run.name !== github.context.action );
+        const filtered = response.data.check_runs.filter( run => run.name !== context.action );
         console.log(filtered);
         const failed = filtered.filter(
             run => run.status === "completed" && run.conclusion === "failure"
@@ -6104,14 +6104,10 @@ async function reqStatus() {
         const response = await octokit.request("GET https://api.github.com/repos/{owner}/{repo}/commits/{sha}/status", {
             owner: owner,
             repo: repo,
-            sha: github.context.sha,
+            sha: context.sha,
         });
-        if (context) {
-            // look for the specific context
-            filtered = response.data;
-        } else {
-            filtered = response.data;
-        }
+        // temp
+        filtered = response.data;
         console.log(filtered);
         return filtered;
     } catch (error) {
