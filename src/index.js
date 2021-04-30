@@ -9,8 +9,8 @@ const octokit = github.getOctokit(token);
 core.info(github.context);
 const context = github.context;
 core.info(context);
-core.info(context.payload);
-const [owner, repo] = context.payload.repository;
+core.info(context.repo());
+const [owner, repo] = context.repo();
 
 function monitorStatus() {
     core.info("Monitoring for checks and status changes");
