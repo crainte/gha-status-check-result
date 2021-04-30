@@ -8702,19 +8702,45 @@ const reqHeaders = {
     Authorization: `token ${token}`
 }
 
-function reqAll() {
-    reqChecks();
+function monitorStatus() {
+    console.log("Monitoring for checks and status changes");
+    reqChecks()
+        .then(status => {
+            switch (status) {
+                case "FAILURE":
+                    console.log("We have a failure");
+                    return;
+                case "SUCCESS":
+                    console.log("We have a success");
+                    return;
+                case "IN_PROGRESS":
+                    console.log("We have to wait...");
+                    return new Promise(resolve => setTimeout(resolve, interval)).then(
+                        monitorStatus
+                    );
+            }
+        });
     reqStatus();
 }
 
 async function reqChecks() {
     try {
         const response = await axios.get(checkUrl, { headers: reqHeaders});
-        console.log(response);
-        return response;
+        const filtered = response.check_runs.filter( run => run.name !== selfName );
+        console.log(filtered);
+        const failed = filtered.filter(
+            run => run.status === "completed" && run.conclusion === "failure"
+        );
+        if (failed.length) return "FAILURE";
+        const pending = filtered.filter(
+            run => run.status === "queued" || run.status === "in_progress"
+        );
+        if (pending.length) return "IN_PROGRESS";
     } catch (error) {
         console.log(error);
+        ret = "FAILURE";
     }
+    return "SUCCESS";
 }
 
 async function reqStatus() {
@@ -8725,12 +8751,6 @@ async function reqStatus() {
     } catch (error) {
         console.log(error);
     }
-}
-
-function monitorStatus() {
-    console.log("Monitoring for checks and status changes");
-    reqAll();
-    return "SUCCESS";
 }
 
 monitorStatus();
