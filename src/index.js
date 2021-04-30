@@ -6,10 +6,8 @@ const timeout = core.getInput('timeout') || 30000;
 const interval = core.getInput('interval') || 5000;
 
 const octokit = github.getOctokit(token);
-console.log(github)
-console.log(octokit)
 const context = github.context;
-const [owner, repo] = context.repo;
+const [owner, repo] = context.payload.repository;
 
 function monitorStatus() {
     console.log("Monitoring for checks and status changes");
