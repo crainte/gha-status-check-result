@@ -11,37 +11,41 @@ const context = github.context;
 const repo = context.payload.repository.full_name;
 
 //core.info(util.inspect(context));
-
-function monitorStatus() {
+function monitorChecks() {
     core.info("Monitoring for checks and status changes");
     reqChecks()
         .then(status => {
             switch (status) {
                 case "FAILURE":
                     core.info("We have a failure");
-                    return;
+                    return 1;
                 case "SUCCESS":
                     core.info("We have a success");
                     return;
                 case "IN_PROGRESS":
                     core.info("We have to wait...");
                     return new Promise(resolve => setTimeout(resolve, interval)).then(
-                        monitorStatus
+                        monitorChecks
                     );
             }
         });
-    //reqStatus();
+}
+
+function monitorStatus() {
+    return;
+}
+
+function monitorAll() {
+    return monitorChecks && monitorStatus;
 }
 
 async function reqChecks() {
     try {
         core.info("Requesting Checks");
         const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/check-runs`);
-        console.log("Response");
-        console.log(response);
         const filtered = response.data.check_runs.filter( run => run.name !== context.action );
-        console.log("Print filtered list");
-        console.log(filtered);
+        // no checks besides self, wait for something
+        if (!filtered.length) return "IN_PROGRESS";
         const failed = filtered.filter(
             run => run.status === "completed" && run.conclusion === "failure"
         );
@@ -74,7 +78,7 @@ async function reqStatus() {
     }
 }
 
-monitorStatus();
+monitorAll();
 
 setTimeout(() => {
     core.setFailed("Maximum timeout reached");
