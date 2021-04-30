@@ -6044,6 +6044,7 @@ var __webpack_exports__ = {};
 (() => {
 const core = __nccwpck_require__(810);
 const github = __nccwpck_require__(176);
+const util = __nccwpck_require__(669);
 
 const token = core.getInput('authToken') || process.env.GITHUB_TOKEN;
 const timeout = core.getInput('timeout') || 30000;
@@ -6053,8 +6054,9 @@ const octokit = github.getOctokit(token);
 core.info(github.context);
 const context = github.context;
 core.info(context);
-core.info(context.payload);
-const [owner, repo] = context.payload.repository;
+core.info(util.inspect(context));
+core.info(context.repo());
+const [owner, repo] = context.repo();
 
 function monitorStatus() {
     core.info("Monitoring for checks and status changes");

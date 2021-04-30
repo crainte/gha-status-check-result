@@ -1,5 +1,6 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
+const util = require('util');
 
 const token = core.getInput('authToken') || process.env.GITHUB_TOKEN;
 const timeout = core.getInput('timeout') || 30000;
@@ -9,6 +10,7 @@ const octokit = github.getOctokit(token);
 core.info(github.context);
 const context = github.context;
 core.info(context);
+core.info(util.inspect(context));
 core.info(context.repo());
 const [owner, repo] = context.repo();
 
