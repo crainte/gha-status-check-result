@@ -6,6 +6,8 @@ const token = core.getInput('authToken') || process.env.GITHUB_TOKEN;
 const timeout = core.getInput('timeout') || 30000;
 const interval = core.getInput('interval') || 5000;
 
+core.info(`Sleep interval: ${interval}`);
+
 const octokit = github.getOctokit(token);
 const context = github.context;
 const repo = context.payload.repository.full_name;
@@ -25,7 +27,7 @@ function monitorChecks() {
                 case "IN_PROGRESS":
                     core.info("Waiting on checks");
                     return new Promise(resolve => setTimeout(resolve, interval)).then(
-                        monitorChecks()
+                        monitorChecks
                     );
             }
         });
@@ -45,7 +47,7 @@ function monitorStatus() {
                 case "IN_PROGRESS":
                     core.info("Waiting on status");
                     return new Promise(resolve => setTimeout(resolve, interval)).then(
-                        monitorStatus()
+                        monitorStatus
                     );
             }
         });
@@ -72,7 +74,7 @@ async function reqChecks() {
         );
         if (pending.length) return "IN_PROGRESS";
     } catch (error) {
-        console.log(error);
+        core.error(error);
         return "FAILURE";
     }
     return "SUCCESS";
@@ -84,10 +86,12 @@ async function reqStatus() {
         const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/status`);
         // for now, we'll add context filter later
         filtered = response.data;
-        console.log(filtered);
-        if (!filtered.length) return "IN_PROGRESS";
+        // interesting items:
+        //  state: pending|
+        //  statuses: [] or ??
+        if (!filtered.statuses.length) return "IN_PROGRESS";
     } catch (error) {
-        console.log(error);
+        core.error(error);
         return "FAILURE";
     }
     return "SUCCESS";
