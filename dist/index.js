@@ -6074,12 +6074,14 @@ function monitorStatus() {
                     );
             }
         });
-    reqStatus();
+    //reqStatus();
 }
 
 async function reqChecks() {
     try {
         core.info("Requesting Checks");
+        core.info(context.payload.repository.url);
+        core.info(`${context.payload.repository.url}/commits/${context.sha}/check-runs`);
         const response = await octokit.request("GET {url}/commits/{sha}/check-runs", {
             url: context.payload.repository.url,
             sha: context.sha,
