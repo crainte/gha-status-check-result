@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Testing self
-        uses: crainte/gha-status-check-result@0.0.5
+        uses: crainte/gha-status-check-result@main
         id: testing
         with:
           authToken: ${{ secrets.GITHUB_TOKEN }}
