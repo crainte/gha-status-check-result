@@ -1,13 +1,12 @@
-import { Octokit } from "@octokit/core";
-import { core } from "@actions/core";
-import { github } from "@actions/github";
+const core = require('@actions/core');
+const github = require('@actions/github');
 
 const token = core.getInput('authToken') || process.env.GITHUB_TOKEN;
 const timeout = core.getInput('timeout') || 30000;
 const interval = core.getInput('interval') || 5000;
 const context = core.getInput('context') || null;
 
-const octokit = new Octokit({ auth: token });
+const octokit = github.getOctokit(token);
 const selfName = process.env.GITHUB_ACTION;
 const selfRepo = process.env.GITHUB_REPOSITORY;
 const selfSha  = process.env.GITHUB_SHA;
