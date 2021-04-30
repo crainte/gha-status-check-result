@@ -8733,16 +8733,11 @@ function monitorStatus() {
     return "SUCCESS";
 }
 
-monitorStatus()
-    .then(() => process.exit(0))
-    .catch(error => {
-        console.log(error);
-        process.exit(1);
-    });
+monitorStatus();
 
 setTimeout(() => {
     core.setFailed("Maximum timeout reached");
-}, timeout)
+}, timeout);
 
 })();
 
