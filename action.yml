@@ -1,0 +1,16 @@
+name: 'Status Check Result'
+description: 'Check pull request status'
+inputs:
+  authToken:
+    required: True
+  ignore:
+    description: 'Action names to ignore'
+    required: True
+  interval:
+    description: 'Polling interval'
+    required: False
+  timeout:
+    required: False
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
