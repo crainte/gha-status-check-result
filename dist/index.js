@@ -6067,7 +6067,7 @@ function monitorChecks() {
                     core.info("We have a success");
                     return;
                 case "IN_PROGRESS":
-                    core.info("We have to wait...");
+                    core.info("Waiting on checks");
                     return new Promise(resolve => setTimeout(resolve, interval)).then(
                         monitorChecks()
                     );
@@ -6087,7 +6087,7 @@ function monitorStatus() {
                     core.info("We have a success");
                     return;
                 case "IN_PROGRESS":
-                    core.info("We have to wait...");
+                    core.info("Waiting on status");
                     return new Promise(resolve => setTimeout(resolve, interval)).then(
                         monitorStatus()
                     );
@@ -6095,8 +6095,9 @@ function monitorStatus() {
         });
 }
 
-function monitorAll() {
-    return monitorChecks() && monitorStatus();
+async function monitorAll() {
+    let [status, check] = await Promise.all([monitorStatus(), monitorChecks()]);
+    return status && check;
 }
 
 async function reqChecks() {
@@ -6140,6 +6141,7 @@ monitorAll();
 
 setTimeout(() => {
     core.setFailed("Maximum timeout reached");
+    process.exit(1);
 }, timeout);
 
 })();
