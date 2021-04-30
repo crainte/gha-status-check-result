@@ -6080,12 +6080,12 @@ function monitorStatus() {
 async function reqChecks() {
     try {
         core.info("Requesting Checks");
-        core.info(context.payload.repository.url);
-        core.info(`${context.payload.repository.url}/commits/${context.sha}/check-runs`);
-        const response = await octokit.request("GET {url}/commits/{sha}/check-runs", {
+        const response = octokit.request("GET {url}/commits/{sha}/check-runs", {
             url: context.payload.repository.url,
             sha: context.sha,
         });
+        const again = octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/check-runs`);
+        console.log(again);
         console.log("Response");
         console.log(response);
         const filtered = response.data.check_runs.filter( run => run.name !== context.action );
@@ -6108,8 +6108,8 @@ async function reqChecks() {
 
 async function reqStatus() {
     try {
+        var required;
         core.info("Requesting Status");
-        var filtered;
         const response = await octokit.request("GET {url}/commits/{sha}/status", {
             url: context.payload.repository.url,
             sha: context.sha,
