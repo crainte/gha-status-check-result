@@ -6050,22 +6050,25 @@ const timeout = core.getInput('timeout') || 30000;
 const interval = core.getInput('interval') || 5000;
 
 const octokit = github.getOctokit(token);
+core.info(github.context);
 const context = github.context;
+core.info(context);
+core.info(context.payload);
 const [owner, repo] = context.payload.repository;
 
 function monitorStatus() {
-    console.log("Monitoring for checks and status changes");
+    core.info("Monitoring for checks and status changes");
     reqChecks()
         .then(status => {
             switch (status) {
                 case "FAILURE":
-                    console.log("We have a failure");
+                    core.info("We have a failure");
                     return;
                 case "SUCCESS":
-                    console.log("We have a success");
+                    core.info("We have a success");
                     return;
                 case "IN_PROGRESS":
-                    console.log("We have to wait...");
+                    core.info("We have to wait...");
                     return new Promise(resolve => setTimeout(resolve, interval)).then(
                         monitorStatus
                     );
