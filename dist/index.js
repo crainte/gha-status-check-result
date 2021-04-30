@@ -6051,12 +6051,11 @@ const timeout = core.getInput('timeout') || 30000;
 const interval = core.getInput('interval') || 5000;
 
 const octokit = github.getOctokit(token);
-core.info(github.context);
 const context = github.context;
-core.info(context);
 core.info(util.inspect(context));
-core.info(context.repo());
-const [owner, repo] = context.repo();
+const repo = context.payload.repository.name;
+core.info(util.inspect(context.payload.repository.owner));
+const owner = context.repo();
 
 function monitorStatus() {
     core.info("Monitoring for checks and status changes");
