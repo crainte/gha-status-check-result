@@ -12,12 +12,12 @@ const repo = context.payload.repository.full_name;
 
 //core.info(util.inspect(context));
 function monitorChecks() {
-    core.info("Monitoring for checks and status changes");
+    core.info("Monitoring for checks");
     reqChecks()
         .then(status => {
             switch (status) {
                 case "FAILURE":
-                    core.info("We have a failure");
+                    core.error("We have a failure");
                     return 1;
                 case "SUCCESS":
                     core.info("We have a success");
@@ -25,18 +25,34 @@ function monitorChecks() {
                 case "IN_PROGRESS":
                     core.info("We have to wait...");
                     return new Promise(resolve => setTimeout(resolve, interval)).then(
-                        monitorChecks
+                        monitorChecks()
                     );
             }
         });
 }
 
 function monitorStatus() {
-    return;
+    core.info("Monitoring for statuses");
+    reqStatus()
+        .then(status => {
+            switch (status) {
+                case "FAILURE":
+                    core.error("We detected a failed status");
+                    return 1;
+                case "SUCCESS":
+                    core.info("We have a success");
+                    return;
+                case "IN_PROGRESS":
+                    core.info("We have to wait...");
+                    return new Promise(resolve => setTimeout(resolve, interval)).then(
+                        monitorStatus()
+                    );
+            }
+        });
 }
 
 function monitorAll() {
-    return monitorChecks && monitorStatus;
+    return monitorChecks() && monitorStatus();
 }
 
 async function reqChecks() {
@@ -63,19 +79,17 @@ async function reqChecks() {
 
 async function reqStatus() {
     try {
-        var required;
         core.info("Requesting Status");
-        const response = await octokit.request("GET {url}/commits/{sha}/status", {
-            url: context.payload.repository.url,
-            sha: context.sha,
-        });
-        // temp
+        const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/status`);
+        // for now, we'll add context filter later
         filtered = response.data;
         console.log(filtered);
-        return filtered;
+        if (!filtered.length) return "IN_PROGRESS";
     } catch (error) {
         console.log(error);
+        return "FAILURE";
     }
+    return "SUCCESS";
 }
 
 monitorAll();
