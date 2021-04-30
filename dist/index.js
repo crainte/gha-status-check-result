@@ -6054,7 +6054,7 @@ const octokit = github.getOctokit(token);
 const context = github.context;
 const repo = context.payload.repository.full_name;
 
-core.info(util.inspect(context));
+//core.info(util.inspect(context));
 
 function monitorStatus() {
     core.info("Monitoring for checks and status changes");
@@ -6079,11 +6079,15 @@ function monitorStatus() {
 
 async function reqChecks() {
     try {
+        core.info("Requesting Checks");
         const response = await octokit.request("GET {url}/commits/{sha}/check-runs", {
             url: context.payload.repository.url,
             sha: context.sha,
         });
+        console.log("Response");
+        console.log(response);
         const filtered = response.data.check_runs.filter( run => run.name !== context.action );
+        console.log("Print filtered list");
         console.log(filtered);
         const failed = filtered.filter(
             run => run.status === "completed" && run.conclusion === "failure"
@@ -6102,6 +6106,7 @@ async function reqChecks() {
 
 async function reqStatus() {
     try {
+        core.info("Requesting Status");
         var filtered;
         const response = await octokit.request("GET {url}/commits/{sha}/status", {
             url: context.payload.repository.url,
