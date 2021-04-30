@@ -15,11 +15,18 @@ on:
   status: {}
 
 jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: max/secret-scan@master
+
   self:
     runs-on: ubuntu-latest
     steps:
       - name: Testing self
-        uses: crainte/gha-status-check-result
+        uses: crainte/gha-status-check-result@main
         id: testing
         with:
           authToken: ${{ secrets.GITHUB_TOKEN }}
+          apiKey: ${{ secrets.GIPHY_API_KEY }}

@@ -1,60 +1,236 @@
 const core = require('@actions/core');
-const axios = require('axios');
 const github = require('@actions/github');
+const axios = require('axios');
+const events = require('events');
+const util = require('util');
 
-const token = core.getInput('authToken') || process.env.GITHUB_TOKEN;
-const timeout = core.getInput('timeout') || 30000;
-const interval = core.getInput('interval') || 10000;
+const token = core.getInput('authToken');
+const apiKey = core.getInput('apiKey');
+const rating = core.getInput('rating') || "pg-13";
+const timeout = parseInt(core.getInput('timeout')) || 30000;
+const interval = parseInt(core.getInput('interval')) || 5000;
+const ctx = core.getInput('context') || null;
 
-const selfName = process.env.GITHUB_ACTION;
-const selfRepo = process.env.GITHUB_REPOSITORY;
-const selfSha  = process.env.GITHUB_SHA;
+const bus = new events();
+const octokit = github.getOctokit(token);
+const context = github.context;
+const repo = context.payload.repository.full_name;
+const gifTitle = "gha-status-check-result";
+const giphyURL = "https://api.giphy.com/v1/gifs/random";
 
-const apiUrl = `https://api.github.com/repos/${selfRepo}`;
-const checkUrl = `${apiUrl}/commits/${selfSha}/check-runs`;
-const reqHeaders = {
-    Accept: "application/vnd.github.v3+json; application/vnd.github.antiope-preview+json",
-    Authorization: `token ${token}`
-}
+status_pending = 0;
+checks_pending = 0;
 
-function reqAll() {
-    reqChecks();
-    reqStatus();
+core.debug(util.inspect(context));
+
+const waitForResult = new Promise((resolve, reject) => {
+    bus.once('error', (event) => {
+        reject(event.message);
+    });
+    bus.once('failure', (event) => {
+        resolve(event.message);
+    });
+    bus.once('success', (event) => {
+        resolve(event.message);
+    });
+})
+
+async function monitorAll() {
+
+    while ( true ) {
+
+        reqChecks();
+        reqStatus();
+
+        core.info(`Sleeping ${interval} ms`);
+        await new Promise(r => setTimeout(r, interval));
+    }
 }
 
 async function reqChecks() {
     try {
-        const response = await axios.get(checkUrl, { headers: reqHeaders});
-        console.log(response);
-        return response;
+        core.debug("Requesting Checks");
+        const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.payload.pull_request.head.sha}/check-runs`);
+        const filtered = response.data.check_runs.filter( run => run.name !== context.job );
+
+        // no checks besides self, wait for something
+        if (!filtered.length) {
+            core.info("No checks worth watching");
+            return;
+        }
+
+        const failed = filtered.filter(
+            run => run.status === "completed" && run.conclusion === "failure"
+        );
+        if (failed.length) bus.emit('failure', {message: 'Failure detected'});
+
+        const pending = filtered.filter(
+            run => run.status === "queued" || run.status === "in_progress"
+        );
+        if (pending.length) {
+            checks_pending = pending.length;
+            core.info(`We are waiting on ${pending.length} checks`);
+            return;
+        } else {
+            checks_pending = 0;
+        }
+
     } catch (error) {
-        console.log(error);
+        core.error(error);
+        bus.emit('failure', {message: 'Failure in processing'});
     }
+    core.debug("Made it to the end of Checks");
+    if ( !status_pending ) {
+        bus.emit('success', {message: 'success'});
+    }
+    return;
 }
 
 async function reqStatus() {
     try {
-        const response = await axios.get(checkUrl, { headers: reqHeaders});
-        console.log(response);
-        return response;
+        core.debug("Requesting Status");
+        const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.payload.pull_request.head.sha}/statuses`);
+
+        if (ctx) {
+            // we are looking for a specific context
+            filtered = response.data.filter(
+                run => run.context === ctx
+            );
+        } else {
+            filtered = response.data;
+        }
+
+        if (!filtered.length) {
+            core.info("No status worth watching");
+            return;
+        }
+
+        const failed = filtered.filter(
+            run => run.state === "failure"
+        );
+        if (failed.length) bus.emit('failure', {message: 'Failure detected'});
+
+        const pending = filtered.filter(
+            run => run.state === "pending"
+        );
+        if (pending.length) {
+            status_pending = pending.length;
+            core.info(`We are waiting on ${pending.length} status`);
+            return;
+        } else {
+            status_pending = 0;
+        }
+
     } catch (error) {
-        console.log(error);
+        core.error(error);
+        bus.emit('failure', {message: 'Failure in processing'});
     }
+    core.debug("Made it to the end of Status");
+    if ( !checks_pending ) {
+        bus.emit('success', {message: 'success'});
+    }
+    return;
 }
 
-function monitorStatus() {
-    console.log("Monitoring for checks and status changes");
-    reqAll();
-    return "SUCCESS";
+async function deleteComment(comment) {
+    return await octokit.request(`DELETE ${comment.url}`);
 }
 
-monitorStatus()
-    .then(() => process.exit(0))
-    .catch(error => {
-        console.log(error);
+async function getComments() {
+    return await octokit.request(`GET ${context.payload.repository.url}/issues/${context.payload.number}/comments`);
+}
+
+async function makeComment(gif) {
+    console.log("make comment");
+    return await octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
+        body: `![${gifTitle}](${gif.image_url})`
+    });
+}
+
+async function getGif(tag) {
+    // be nice if I could force octokit to do this
+    return await axios.get(giphyURL, {
+        params: {
+            tag: tag,
+            rating: rating,
+            fmt: "json",
+            api_key: apiKey
+        }
+    });
+}
+
+function main() {
+    getComments()
+        .then(comments => {
+            core.debug('Processing comments');
+            filtered = comments.data.filter(
+                comment => comment.body.includes(gifTitle)
+            );
+            return filtered;
+        })
+        .then(filtered => {
+            core.debug('Deleting comments');
+            return filtered.map(deleteComment);
+        })
+        .then(result => {
+            return result;
+        })
+        .catch(e => {
+            core.error('Something borked: ' + e.message);
+        });
+    monitorAll();
+}
+
+function up() {
+    return giphy('thumbs-up');
+}
+function down() {
+    return giphy('thumbs-down');
+}
+function giphy(tag) {
+    // nothing at all
+    return getGif(tag)
+        .then(gif => {
+            return gif.data.data;
+        })
+        .then(makeComment)
+        .then(response => {
+            return response;
+        })
+        .catch(e => {
+            core.error('Something broke: ' + e.message);
+        });
+}
+
+main();
+
+waitForResult
+    .then((event) => {
+        switch(event) {
+            case "timeout":
+                return down() && Promise.reject();
+            case "failure":
+                return down() && Promise.reject();
+            case "success":
+                return up();
+        }
+    })
+    .then(result => {
+        return result;
+    })
+    .then(() => {
+        process.exit(0);
+    })
+    .catch(e => {
         process.exit(1);
     });
 
+
 setTimeout(() => {
-    core.setFailed("Maximum timeout reached");
-}, timeout)
+    if( !status_pending && !checks_pending ) {
+        bus.emit('success', {message: 'success'});
+    } else {
+        core.setFailed('Timed out waiting for results');
+        bus.emit('failure', {message: 'timeout'});
+    }
+}, timeout);
