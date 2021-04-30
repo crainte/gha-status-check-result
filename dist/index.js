@@ -6052,10 +6052,9 @@ const interval = core.getInput('interval') || 5000;
 
 const octokit = github.getOctokit(token);
 const context = github.context;
+const repo = context.payload.repository.full_name;
+
 core.info(util.inspect(context));
-const repo = context.payload.repository.name;
-core.info(util.inspect(context.payload.repository.owner));
-const owner = context.repo();
 
 function monitorStatus() {
     core.info("Monitoring for checks and status changes");
@@ -6080,9 +6079,8 @@ function monitorStatus() {
 
 async function reqChecks() {
     try {
-        const response = await octokit.request("GET https://api.github.com/repos/{owner}/{repo}/commits/{sha}/check-runs", {
-            owner: owner,
-            repo: repo,
+        const response = await octokit.request("GET {url}/commits/{sha}/check-runs", {
+            url: context.payload.repository.url,
             sha: context.sha,
         });
         const filtered = response.data.check_runs.filter( run => run.name !== context.action );
@@ -6105,9 +6103,8 @@ async function reqChecks() {
 async function reqStatus() {
     try {
         var filtered;
-        const response = await octokit.request("GET https://api.github.com/repos/{owner}/{repo}/commits/{sha}/status", {
-            owner: owner,
-            repo: repo,
+        const response = await octokit.request("GET {url}/commits/{sha}/status", {
+            url: context.payload.repository.url,
             sha: context.sha,
         });
         // temp
