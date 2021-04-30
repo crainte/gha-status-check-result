@@ -6051,9 +6051,7 @@ const interval = core.getInput('interval') || 5000;
 const context = core.getInput('context') || null;
 
 const octokit = github.getOctokit(token);
-const selfName = process.env.GITHUB_ACTION;
-const selfRepo = process.env.GITHUB_REPOSITORY;
-const selfSha  = process.env.GITHUB_SHA;
+const [owner, repo] = github.context.repo;
 
 function monitorStatus() {
     console.log("Monitoring for checks and status changes");
@@ -6078,11 +6076,12 @@ function monitorStatus() {
 
 async function reqChecks() {
     try {
-        const response = await octokit.request("GET https://api.github.com/repos/{repo}/commits/{sha}/check-runs", {
-            repo: selfRepo,
-            sha: selfSha,
+        const response = await octokit.request("GET https://api.github.com/repos/{owner}/{repo}/commits/{sha}/check-runs", {
+            owner: owner,
+            repo: repo,
+            sha: github.context.sha,
         });
-        const filtered = response.data.check_runs.filter( run => run.name !== selfName );
+        const filtered = response.data.check_runs.filter( run => run.name !== github.context.action );
         console.log(filtered);
         const failed = filtered.filter(
             run => run.status === "completed" && run.conclusion === "failure"
@@ -6102,9 +6101,10 @@ async function reqChecks() {
 async function reqStatus() {
     try {
         var filtered;
-        const response = await octokit.request("GET https://api.github.com/repos/{repo}/commits/{sha}/status", {
-            repo: selfRepo,
-            sha: selfSha,
+        const response = await octokit.request("GET https://api.github.com/repos/{owner}/{repo}/commits/{sha}/status", {
+            owner: owner,
+            repo: repo,
+            sha: github.context.sha,
         });
         if (context) {
             // look for the specific context
