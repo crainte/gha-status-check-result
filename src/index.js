@@ -1,18 +1,16 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
-const util = require('util');
 
 const token = core.getInput('authToken') || process.env.GITHUB_TOKEN;
-const timeout = core.getInput('timeout') || 30000;
-const interval = core.getInput('interval') || 5000;
-
-core.info(`Sleep interval: ${interval}`);
+const timeout = parseInt(core.getInput('timeout')) || 30000;
+const interval = parseInt(core.getInput('interval')) || 5000;
+const ctx = core.getInput('context') || null;
 
 const octokit = github.getOctokit(token);
 const context = github.context;
 const repo = context.payload.repository.full_name;
+const gifTitle = "gha-status-check-result"
 
-//core.info(util.inspect(context));
 function monitorChecks() {
     core.info("Monitoring for checks");
     reqChecks()
@@ -63,16 +61,20 @@ async function reqChecks() {
         core.info("Requesting Checks");
         const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/check-runs`);
         const filtered = response.data.check_runs.filter( run => run.name !== context.action );
+
         // no checks besides self, wait for something
         if (!filtered.length) return "IN_PROGRESS";
+
         const failed = filtered.filter(
             run => run.status === "completed" && run.conclusion === "failure"
         );
         if (failed.length) return "FAILURE";
+
         const pending = filtered.filter(
             run => run.status === "queued" || run.status === "in_progress"
         );
         if (pending.length) return "IN_PROGRESS";
+
     } catch (error) {
         core.error(error);
         return "FAILURE";
@@ -83,13 +85,29 @@ async function reqChecks() {
 async function reqStatus() {
     try {
         core.info("Requesting Status");
-        const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/status`);
-        // for now, we'll add context filter later
-        filtered = response.data;
-        // interesting items:
-        //  state: pending|
-        //  statuses: [] or ??
-        if (!filtered.statuses.length) return "IN_PROGRESS";
+        const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/statuses`);
+
+        if (ctx) {
+            // we are looking for a specific context
+            filtered = response.data.filter(
+                run => run.context === ctx
+            );
+        } else {
+            filtered = response.data;
+        }
+
+        if (!filtered.length) return "IN_PROGRESS";
+
+        const failed = filtered.filter(
+            run => run.state === "failure"
+        );
+        if (failed.length) return "FAILURE";
+
+        const pending = filtered.filter(
+            run => run.state === "pending"
+        );
+        if (pending.length) return "IN_PROGRESS";
+
     } catch (error) {
         core.error(error);
         return "FAILURE";
@@ -97,7 +115,35 @@ async function reqStatus() {
     return "SUCCESS";
 }
 
-monitorAll();
+function deleteComment(comment) {
+    return octokit.request(`DELETE ${context.payload.repository.url}/comments/${comment.id}`);
+}
+
+function listComments() {
+    core.info("Loading comments");
+    const response = octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/comments`);
+
+    filtered = response.filter(
+        comment => comment.body.includes(gifTitle)
+    );
+
+    if (!filtered.length) return Promise.resolve();
+
+    core.info("Found comments, deleting");
+    return Promise.all(filtered.map(deleteComment));
+}
+
+function wrapper() {
+    return listComments()
+        .then(() => monitorAll());
+}
+
+wrapper()
+    .then(() => process.exit(0))
+    .catch(error => {
+        core.error(error);
+        process.exit(1);
+    });
 
 setTimeout(() => {
     core.setFailed("Maximum timeout reached");
