@@ -8829,31 +8829,30 @@ async function listComments() {
     return filtered.map(deleteComment);
 }
 
-function makeComment(gif) {
-    return octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
+async function makeComment(gif) {
+    return await octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
         body: `![${gifTitle}](${gif.image_url})`
     });
 }
 
-async function processResult(tag) {
+function processResult(tag) {
     core.info('Making comment');
-    const gif = await getGif(tag);
+    const gif = getGif(tag);
     core.info('After getGif');
     core.info(util.inspect(gif));
-    const response = await makeComment(gif);
+    const response = makeComment(gif);
     core.info(util.inspect(response));
     return response;
 }
 
-function getGif(tag) {
+async function getGif(tag) {
     // be nice if I could force octokit to do this
-    const response = axios.get(giphyURL, {
+    return await axios.get(giphyURL, {
         tag: tag,
         rating: rating,
         fmt: "json",
         api_key: apiKey
     });
-    return response.data.data;
 }
 
 function main() {
