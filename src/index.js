@@ -155,7 +155,7 @@ function processResult(tag) {
     const gif = getGif(tag);
     core.info('After getGif');
     core.info(util.inspect(gif));
-     makeComment(gif);
+    makeComment(gif);
 }
 
 function getGif(tag) {
@@ -166,7 +166,10 @@ function getGif(tag) {
         fmt: "json",
         api_key: apiKey
     })
-        .then(res => res.data.data);
+        .then(res => res.data.data)
+        .catch(e => {
+            core.error('Giphy said no: ' + e.message);
+        });
 }
 
 function main() {
