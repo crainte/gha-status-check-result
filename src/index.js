@@ -12,6 +12,8 @@ const context = github.context;
 const repo = context.payload.repository.full_name;
 const gifTitle = "gha-status-check-result"
 
+core.info(util.inspect(context));
+
 function monitorChecks() {
     core.info("Monitoring for checks");
     reqChecks()
@@ -134,12 +136,18 @@ async function listComments() {
     return Promise.all(filtered.map(deleteComment));
 }
 
-async function wrapper() {
+async function makeComment(url) {
+    return octokit.request(`POST ${context.payload.repository.url}/commits/${context.sha}/comments`, {
+        body: `![${gifTitle}](${url})`
+    });
+}
+
+async function main() {
     await listComments();
     return monitorAll();
 }
 
-wrapper();
+main();
 
 setTimeout(() => {
     core.setFailed("Maximum timeout reached");
