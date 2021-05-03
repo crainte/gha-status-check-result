@@ -150,17 +150,9 @@ function makeComment(gif) {
     });
 }
 
-function processResult(tag) {
-    core.info('Making comment');
-    const gif = getGif(tag);
-    core.info('After getGif');
-    core.info(util.inspect(gif));
-    makeComment(gif);
-}
-
-async function getGif(tag) {
+function getGif(tag) {
     // be nice if I could force octokit to do this
-    return await axios.get(giphyURL, {
+    return axios.get(giphyURL, {
         tag: tag,
         rating: rating,
         fmt: "json",
@@ -183,7 +175,8 @@ function main() {
 main();
 
 setTimeout(() => {
-    processResult('thumbs-down');
+    getGif('thumbs-down')
+        .then(makeComment);
     core.setFailed("Maximum timeout reached");
     process.exit(1);
 }, timeout);
