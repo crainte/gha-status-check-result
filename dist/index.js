@@ -8835,15 +8835,15 @@ async function makeComment(tag) {
     return;
 }
 
-function getGif(tag) {
+async function getGif(tag) {
     // be nice if I could force octokit to do this
-    return axios.get(giphyURL, {
+    const response = await axios.get(giphyURL, {
         tag: tag,
         rating: rating,
         fmt: "json",
         api_key: apiKey
-    })
-        .then(result => result.data.data);
+    });
+    return response.data.data;
 }
 
 function main() {
