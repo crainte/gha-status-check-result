@@ -8848,11 +8848,7 @@ function main() {
             filtered = comments.data.filter(
                 comment => comment.body.includes(gifTitle)
             );
-            return filtered;
-        })
-        .then(deleteComment)
-        .then(results => {
-            return results;
+            return Promise.all(filtered.map(deleteComment));
         })
         .then(() => down())
         .catch(e => {
