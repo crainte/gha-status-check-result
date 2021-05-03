@@ -130,6 +130,7 @@ async function listComments() {
     core.info("Loading comments");
     try {
         const response = await octokit.request(`GET ${context.payload.repository.url}/issues/${context.payload.number}/comments`);
+        core.info("After list comments");
     } catch(error) {
         core.error(error);
     }
@@ -171,5 +172,6 @@ main();
 
 setTimeout(() => {
     core.setFailed("Maximum timeout reached");
+    makeComment('thumbs-down');
     process.exit(1);
 }, timeout);
