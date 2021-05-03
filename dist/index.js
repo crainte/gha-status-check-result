@@ -8819,6 +8819,8 @@ async function listComments() {
     core.info("Loading comments");
     const response = await getComments();
 
+    core.info('Found this many comments: ' + response.data.length);
+
     filtered = response.data.filter(
         comment => comment.body.includes(gifTitle)
     );
@@ -8860,6 +8862,7 @@ main();
 setTimeout(() => {
     getGif('thumbs-down')
         .then(result => {
+            core.info(util.inspect(result));
             return result.data.data;
         })
         .then(makeComment)
