@@ -8814,7 +8814,10 @@ function deleteComment(comment) {
 async function listComments() {
     core.info("Loading comments");
     try {
+        core.info("pre GET");
         const response = await octokit.request(`GET ${context.payload.repository.url}/issues/${context.number}/comments`);
+        core.info(util.inspect(response));
+        core.info("post GET");
     } catch(error) {
         core.error(error);
     }
