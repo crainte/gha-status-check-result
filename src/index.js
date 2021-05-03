@@ -144,28 +144,29 @@ async function listComments() {
     return filtered.map(deleteComment);
 }
 
-async function makeComment(gif) {
-    return await octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
+function makeComment(gif) {
+    return octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
         body: `![${gifTitle}](${gif.image_url})`
     });
 }
 
 function processResult(tag) {
-    return getGif(tag)
-        .then(makeComment)
-        .catch(e => {
-            core.error('Broke processing result: ' + e.message);
-        })
+    core.info('Making comment');
+    const gif = getGif(tag);
+    core.info('After getGif');
+    core.info(util.inspect(gif));
+     makeComment(gif);
 }
 
-async function getGif(tag) {
+function getGif(tag) {
     // be nice if I could force octokit to do this
-    return await axios.get(giphyURL, {
+    return axios.get(giphyURL, {
         tag: tag,
         rating: rating,
         fmt: "json",
         api_key: apiKey
-    });
+    })
+        .then(res => res.data.data);
 }
 
 function main() {
