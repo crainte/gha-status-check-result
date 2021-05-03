@@ -8827,7 +8827,7 @@ async function listComments() {
 
 async function makeComment(tag) {
     core.info('Making comment');
-    const gif = await getGif(tag);
+    const gif = getGif(tag);
     core.info('After getGif');
     core.info(util.inspect(gif));
     const response = await octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
