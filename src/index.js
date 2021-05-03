@@ -151,19 +151,17 @@ function makeComment(gif) {
     });
 }
 
-function getGif(tag) {
+async function getGif(tag) {
     // be nice if I could force octokit to do this
     core.info("getGif");
-    return axios.get(giphyURL, {
+    const response = await axios.get(giphyURL, {
         tag: tag,
         rating: rating,
         fmt: "json",
         api_key: apiKey
-    })
-        .then(res => { core.info("Data received"); return res.data.data; })
-        .catch(e => {
-            core.error('Giphy said no: ' + e.message);
-        });
+    });
+
+    return response.data.data;
 }
 
 function main() {
