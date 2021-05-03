@@ -8829,9 +8829,9 @@ async function listComments() {
     return filtered.map(deleteComment);
 }
 
-function makeComment(gif) {
+async function makeComment(gif) {
     core.info("makeComment");
-    return octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
+    return await octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
         body: `![${gifTitle}](${gif.image_url})`
     });
 }
@@ -8845,6 +8845,7 @@ async function getGif(tag) {
         fmt: "json",
         api_key: apiKey
     });
+    core.info(util.inspect(response));
 
     return response.data.data;
 }
@@ -8861,10 +8862,10 @@ main();
 
 setTimeout(() => {
     getGif('thumbs-down')
-        .then(makeComment)
-        .catch(e => {
-            core.error('Something broke: ' + e.message);
-        })
+      .then(makeComment)
+      .catch(e => {
+          core.error('Something broke: ' + e.message);
+      })
     core.setFailed("Maximum timeout reached");
     process.exit(1);
 }, timeout);
