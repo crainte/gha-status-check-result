@@ -8807,21 +8807,15 @@ async function reqStatus() {
     return "SUCCESS";
 }
 
-function deleteComment(comment) {
+async function deleteComment(comment) {
     return octokit.request(`DELETE ${context.payload.repository.url}/comments/${comment.id}`);
 }
 
 async function listComments() {
     core.info("Loading comments");
-    try {
-        const response = await octokit.request(`GET ${context.payload.repository.url}/issues/${context.payload.number}/comments`);
-        core.info(util.inspect(response));
-        core.info("After list comments");
-    } catch(error) {
-        core.error(error);
-    }
+    const response = await octokit.request(`GET ${context.payload.repository.url}/issues/${context.payload.number}/comments`);
 
-    filtered = await response.data.filter(
+    filtered = response.data.filter(
         comment => comment.body.includes(gifTitle)
     );
 
@@ -8831,17 +8825,17 @@ async function listComments() {
     return filtered.map(deleteComment);
 }
 
-function makeComment(tag) {
+async function makeComment(tag) {
     core.info('Making comment');
-    const gif = getGif(tag);
+    const gif = await getGif(tag);
     core.info(util.inspect(gif));
-    return octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
+    return await octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
         body: `![${gifTitle}](${gif.image_url})`
     });
 }
 
-function getGif(tag) {
-    return axios.get(giphyURL, {
+async function getGif(tag) {
+    return await axios.get(giphyURL, {
         tag: tag,
         rating: rating,
         fmt: "json",
