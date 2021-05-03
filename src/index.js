@@ -151,13 +151,11 @@ async function makeComment(gif) {
 }
 
 function processResult(tag) {
-    core.info('Making comment');
-    const gif = getGif(tag);
-    core.info('After getGif');
-    core.info(util.inspect(gif));
-    const response = makeComment(gif);
-    core.info(util.inspect(response));
-    return response;
+    return getGif(tag)
+        .then(makeComment)
+        .catch(e => {
+            core.error('Broke processing result: ' + e.message);
+        })
 }
 
 async function getGif(tag) {
