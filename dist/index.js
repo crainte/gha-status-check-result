@@ -6163,9 +6163,9 @@ function deleteComment(comment) {
     return octokit.request(`DELETE ${context.payload.repository.url}/comments/${comment.id}`);
 }
 
-function listComments() {
+async function listComments() {
     core.info("Loading comments");
-    const response = octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/comments`);
+    const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/comments`);
 
     core.info(response);
 
