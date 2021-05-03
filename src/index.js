@@ -16,7 +16,7 @@ const repo = context.payload.repository.full_name;
 const gifTitle = "gha-status-check-result";
 const giphyURL = "https://api.giphy.com/v1/gifs/random";
 
-core.info(util.inspect(context));
+//core.info(util.inspect(context));
 
 function monitorChecks() {
     core.info("Monitoring for checks");
@@ -130,6 +130,7 @@ async function listComments() {
     core.info("Loading comments");
     try {
         const response = await octokit.request(`GET ${context.payload.repository.url}/issues/${context.payload.number}/comments`);
+        core.info(util.inspect(response));
         core.info("After list comments");
     } catch(error) {
         core.error(error);
@@ -166,7 +167,7 @@ async function getGif(tag) {
 
 function main() {
     listComments();
-    return monitorAll();
+    monitorAll();
 }
 
 main();
