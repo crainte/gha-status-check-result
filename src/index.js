@@ -153,28 +153,23 @@ async function getGif(tag) {
 function main() {
     getComments()
         .then(comments => {
-            core.info(util.inspect(comments));
             filtered = comments.data.filter(
                 comment => comment.body.includes(gifTitle)
             );
-            core.info(util.inspect(filtered));
-            if (!filtered.length) return Promise.resolve();
+            if (!filtered.length) {
+                core.info('Attempt to resolve');
+                return Promise.resolve();
+            }
             return filtered;
         })
         .then(deleteComment)
         .catch(e => {
             core.error('Something borked: ' + e.message);
-        })
-    monitorAll();
-}
-
-main();
-
-setTimeout(() => {
+        });
     getGif('thumbs-down')
-        .then(result => {
-            core.info(util.inspect(result));
-            return result.data.data;
+        .then(gif => {
+            core.info(util.inspect(gif));
+            return gif.data.data;
         })
         .then(makeComment)
         .then(response => {
@@ -183,6 +178,12 @@ setTimeout(() => {
         .catch(e => {
             core.error('Something broke: ' + e.message);
         })
+    monitorAll();
+}
+
+main();
+
+setTimeout(() => {
     core.setFailed("Maximum timeout reached");
     process.exit(1);
 }, timeout);
