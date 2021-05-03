@@ -8830,6 +8830,7 @@ async function listComments() {
 }
 
 function makeComment(gif) {
+    core.info("makeComment");
     return octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
         body: `![${gifTitle}](${gif.image_url})`
     });
@@ -8837,13 +8838,14 @@ function makeComment(gif) {
 
 function getGif(tag) {
     // be nice if I could force octokit to do this
+    core.info("getGif");
     return axios.get(giphyURL, {
         tag: tag,
         rating: rating,
         fmt: "json",
         api_key: apiKey
     })
-        .then(res => { return res.data.data })
+        .then(res => { core.info("Data received"); return res.data.data; })
         .catch(e => {
             core.error('Giphy said no: ' + e.message);
         });
@@ -8861,7 +8863,10 @@ main();
 
 setTimeout(() => {
     getGif('thumbs-down')
-        .then(makeComment);
+        .then(makeComment)
+        .catch(e => {
+            core.error('Something broke: ' + e.message);
+        })
     core.setFailed("Maximum timeout reached");
     process.exit(1);
 }, timeout);
