@@ -162,8 +162,8 @@ async function getGif(tag) {
         .then(result => result.data.data);
 }
 
-async function main() {
-    await listComments();
+function main() {
+    listComments();
     return monitorAll();
 }
 
