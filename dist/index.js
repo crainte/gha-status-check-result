@@ -6183,12 +6183,7 @@ async function wrapper() {
     return monitorAll();
 }
 
-wrapper()
-    .then(() => process.exit(0))
-    .catch(error => {
-        core.error(error);
-        process.exit(1);
-    });
+wrapper();
 
 setTimeout(() => {
     core.setFailed("Maximum timeout reached");
