@@ -134,9 +134,9 @@ async function listComments() {
     return Promise.all(filtered.map(deleteComment));
 }
 
-function wrapper() {
-    return listComments()
-        .then(() => monitorAll());
+async function wrapper() {
+    await listComments();
+    return monitorAll();
 }
 
 wrapper()
