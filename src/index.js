@@ -124,9 +124,7 @@ async function listComments() {
     core.info("Loading comments");
     const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/comments`);
 
-    core.info(util.inspect(response));
-
-    filtered = response.filter(
+    filtered = response.data.filter(
         comment => comment.body.includes(gifTitle)
     );
 
