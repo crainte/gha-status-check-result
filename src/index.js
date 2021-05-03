@@ -139,10 +139,10 @@ async function makeComment(gif) {
     });
 }
 
-function getGif(tag) {
+async function getGif(tag) {
     // be nice if I could force octokit to do this
     core.info("getGif");
-    return axios.get(giphyURL, {
+    return await axios.get(giphyURL, {
         tag: tag,
         rating: rating,
         fmt: "json",
@@ -175,8 +175,8 @@ setTimeout(() => {
             return result.data.data;
         })
         .then(makeComment)
-        .then(result => {
-            core.info(util.inspect(result));
+        .then(response => {
+            core.info(util.inspect(response));
         })
         .catch(e => {
             core.error('Something broke: ' + e.message);
