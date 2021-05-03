@@ -8810,7 +8810,7 @@ async function reqStatus() {
 async function deleteComment(comment) {
     core.info('deleteComment');
     if (!comment.length) return Promise.resolve();
-    return await octokit.request(`DELETE ${context.payload.repository.url}/comments/${comment.id}`);
+    return await octokit.request(`DELETE ${context.payload.repository.url}/issues/comments/${comment.id}`);
 }
 
 async function getComments() {
@@ -8842,11 +8842,16 @@ function main() {
     // close to working.. doesn't resolve properly
     getComments()
         .then(comments => {
-            return filtered = comments.data.filter(
+            filtered = comments.data.filter(
                 comment => comment.body.includes(gifTitle)
             );
+            core.info(util.inspect(filtered));
+            return filtered;
         })
         .then(deleteComment)
+        .then(results => {
+            return results;
+        })
         .catch(e => {
             core.error('Something borked: ' + e.message);
         });
