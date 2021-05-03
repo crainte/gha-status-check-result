@@ -143,11 +143,13 @@ async function listComments() {
 async function makeComment(tag) {
     core.info('Making comment');
     const gif = await getGif(tag);
+    core.info('After getGif');
     core.info(util.inspect(gif));
-    await octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
+    const response = await octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
         body: `![${gifTitle}](${gif.image_url})`
     });
-    return;
+    core.info(util.inspect(response));
+    return response;
 }
 
 async function getGif(tag) {
@@ -158,6 +160,7 @@ async function getGif(tag) {
         fmt: "json",
         api_key: apiKey
     });
+    core.info('GIF response is: ' + response);
     return response.data.data;
 }
 
