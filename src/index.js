@@ -123,12 +123,16 @@ async function reqStatus() {
 }
 
 async function deleteComment(comment) {
-    return octokit.request(`DELETE ${context.payload.repository.url}/comments/${comment.id}`);
+    return await octokit.request(`DELETE ${context.payload.repository.url}/comments/${comment.id}`);
+}
+
+async function getComments() {
+    return await octokit.request(`GET ${context.payload.repository.url}/issues/${context.payload.number}/comments`);
 }
 
 async function listComments() {
     core.info("Loading comments");
-    const response = await octokit.request(`GET ${context.payload.repository.url}/issues/${context.payload.number}/comments`);
+    const response = await getComments();
 
     filtered = response.data.filter(
         comment => comment.body.includes(gifTitle)
@@ -140,14 +144,18 @@ async function listComments() {
     return filtered.map(deleteComment);
 }
 
-async function makeComment(tag) {
+async function makeComment(gif) {
+    return await octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
+        body: `![${gifTitle}](${gif.image_url})`
+    });
+}
+
+async function processResult(tag) {
     core.info('Making comment');
     const gif = await getGif(tag);
     core.info('After getGif');
     core.info(util.inspect(gif));
-    const response = await octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
-        body: `![${gifTitle}](${gif.image_url})`
-    });
+    const response = await makeComment(gif);
     core.info(util.inspect(response));
     return response;
 }
@@ -160,7 +168,7 @@ async function getGif(tag) {
         fmt: "json",
         api_key: apiKey
     });
-    return response.data.data;
+    return await response.data.data;
 }
 
 function main() {
@@ -174,7 +182,7 @@ function main() {
 main();
 
 setTimeout(() => {
-    makeComment('thumbs-down')
+    processResult('thumbs-down')
         .catch(e => {
             core.error('Unable to post: ' + e.message);
         });
