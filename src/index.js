@@ -128,7 +128,11 @@ function deleteComment(comment) {
 
 async function listComments() {
     core.info("Loading comments");
-    const response = await octokit.request(`GET ${context.payload.repository.url}/issues/${context.number}/comments`);
+    try {
+        const response = await octokit.request(`GET ${context.payload.repository.url}/issues/${context.number}/comments`);
+    } catch(error) {
+        core.error(error);
+    }
 
     filtered = response.data.filter(
         comment => comment.body.includes(gifTitle)
@@ -167,6 +171,5 @@ main();
 
 setTimeout(() => {
     core.setFailed("Maximum timeout reached");
-    makeComment('thumbs-down');
     process.exit(1);
 }, timeout);
