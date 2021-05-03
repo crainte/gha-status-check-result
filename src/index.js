@@ -165,9 +165,18 @@ function main() {
         .catch(e => {
             core.error('Something borked: ' + e.message);
         });
+    monitorAll();
+}
 
+function up() {
+    giphy('thumbs-up');
+}
+function down() {
+    giphy('thumbs-down');
+}
+function giphy(tag) {
     // nothing at all
-    getGif('thumbs-down')
+    getGif(tag)
         .then(gif => {
             core.info(util.inspect(gif));
             return gif.data.data;
@@ -180,13 +189,12 @@ function main() {
             core.info(util.inspect(e));
             core.error('Something broke: ' + e.message);
         })
-    // works
-    monitorAll();
 }
 
 main();
 
 setTimeout(() => {
+    down();
     core.setFailed("Maximum timeout reached");
     process.exit(1);
 }, timeout);
