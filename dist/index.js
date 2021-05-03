@@ -6044,6 +6044,7 @@ var __webpack_exports__ = {};
 (() => {
 const core = __nccwpck_require__(810);
 const github = __nccwpck_require__(176);
+const util = __nccwpck_require__(669);
 
 const token = core.getInput('authToken') || process.env.GITHUB_TOKEN;
 const timeout = parseInt(core.getInput('timeout')) || 30000;
@@ -6167,7 +6168,7 @@ async function listComments() {
     core.info("Loading comments");
     const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/comments`);
 
-    core.info(response);
+    core.info(util.inspect(response));
 
     filtered = response.filter(
         comment => comment.body.includes(gifTitle)

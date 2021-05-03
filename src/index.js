@@ -1,5 +1,6 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
+const util = require('util');
 
 const token = core.getInput('authToken') || process.env.GITHUB_TOKEN;
 const timeout = parseInt(core.getInput('timeout')) || 30000;
@@ -123,7 +124,7 @@ async function listComments() {
     core.info("Loading comments");
     const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/comments`);
 
-    core.info(response);
+    core.info(util.inspect(response));
 
     filtered = response.filter(
         comment => comment.body.includes(gifTitle)
