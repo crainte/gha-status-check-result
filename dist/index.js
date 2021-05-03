@@ -8843,9 +8843,9 @@ function processResult(tag) {
     makeComment(gif);
 }
 
-function getGif(tag) {
+async function getGif(tag) {
     // be nice if I could force octokit to do this
-    return axios.get(giphyURL, {
+    return await axios.get(giphyURL, {
         tag: tag,
         rating: rating,
         fmt: "json",
