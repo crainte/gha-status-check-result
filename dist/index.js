@@ -8845,7 +8845,7 @@ function getGif(tag) {
         tag: tag,
         rating: rating,
         fmt: "json",
-        api_key: api_key
+        api_key: apiKey
     })
         .then(result => result.data.data);
 }
