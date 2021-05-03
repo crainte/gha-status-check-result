@@ -8809,7 +8809,7 @@ async function reqStatus() {
 
 async function deleteComment(comment) {
     core.info('deleteComment');
-    if (!comment.length) return;
+    if (!comment.length) return Promise.resolve();
     return await octokit.request(`DELETE ${context.payload.repository.url}/comments/${comment.id}`);
 }
 
@@ -8861,17 +8861,15 @@ function down() {
 }
 function giphy(tag) {
     // nothing at all
-    getGif(tag)
+    return getGif(tag)
         .then(gif => {
-            core.info(util.inspect(gif));
             return gif.data.data;
         })
         .then(makeComment)
         .then(response => {
-            core.info(util.inspect(response));
+            return response;
         })
         .catch(e => {
-            core.info(util.inspect(e));
             core.error('Something broke: ' + e.message);
         })
 }
