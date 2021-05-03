@@ -8824,13 +8824,14 @@ async function listComments() {
         comment => comment.body.includes(gifTitle)
     );
 
-    if (!filtered.length) return Promise.resolve();
+    if (!filtered.length) return;
 
     core.info("Found comments, deleting");
-    return Promise.all(filtered.map(deleteComment));
+    return filtered.map(deleteComment);
 }
 
 async function makeComment(tag) {
+    core.info('Making comment');
     const gif = await getGif(tag);
     core.info(util.inspect(gif));
     return octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
