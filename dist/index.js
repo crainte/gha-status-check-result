@@ -8836,18 +8836,15 @@ async function makeComment(gif) {
     });
 }
 
-async function getGif(tag) {
+function getGif(tag) {
     // be nice if I could force octokit to do this
     core.info("getGif");
-    const response = await axios.get(giphyURL, {
+    return axios.get(giphyURL, {
         tag: tag,
         rating: rating,
         fmt: "json",
         api_key: apiKey
     });
-    core.info(util.inspect(response));
-
-    return response.data.data;
 }
 
 function main() {
@@ -8862,10 +8859,16 @@ main();
 
 setTimeout(() => {
     getGif('thumbs-down')
-      .then(makeComment)
-      .catch(e => {
-          core.error('Something broke: ' + e.message);
-      })
+        .then(result => {
+            return result.data.data;
+        })
+        .then(makeComment)
+        .then(result => {
+            core.info(util.inspect(result));
+        })
+        .catch(e => {
+            core.error('Something broke: ' + e.message);
+        })
     core.setFailed("Maximum timeout reached");
     process.exit(1);
 }, timeout);
