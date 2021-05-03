@@ -136,7 +136,7 @@ async function listComments() {
         core.error(error);
     }
 
-    filtered = response.data.filter(
+    filtered = await response.data.filter(
         comment => comment.body.includes(gifTitle)
     );
 
@@ -166,7 +166,10 @@ async function getGif(tag) {
 }
 
 function main() {
-    listComments();
+    listComments()
+        .catch(e => {
+            core.error('Something borked: ' + e.message);
+        });
     monitorAll();
 }
 
