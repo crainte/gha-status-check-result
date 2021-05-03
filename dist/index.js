@@ -6167,6 +6167,8 @@ function listComments() {
     core.info("Loading comments");
     const response = octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/comments`);
 
+    core.info(response);
+
     filtered = response.filter(
         comment => comment.body.includes(gifTitle)
     );
