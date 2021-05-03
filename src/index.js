@@ -140,16 +140,18 @@ async function listComments() {
     return filtered.map(deleteComment);
 }
 
-function makeComment(tag) {
+async function makeComment(tag) {
     core.info('Making comment');
-    const gif = getGif(tag);
+    const gif = await getGif(tag);
     core.info(util.inspect(gif));
-    return octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
+    await octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
         body: `![${gifTitle}](${gif.image_url})`
     });
+    return;
 }
 
 function getGif(tag) {
+    // be nice if I could force octokit to do this
     return axios.get(giphyURL, {
         tag: tag,
         rating: rating,
