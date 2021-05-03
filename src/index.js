@@ -123,27 +123,13 @@ async function reqStatus() {
 }
 
 async function deleteComment(comment) {
+    core.info('deleteComment');
     return await octokit.request(`DELETE ${context.payload.repository.url}/comments/${comment.id}`);
 }
 
 async function getComments() {
+    core.info('getComments');
     return await octokit.request(`GET ${context.payload.repository.url}/issues/${context.payload.number}/comments`);
-}
-
-async function listComments() {
-    core.info("Loading comments");
-    const response = await getComments();
-
-    core.info('Found this many comments: ' + response.data.length);
-
-    filtered = response.data.filter(
-        comment => comment.body.includes(gifTitle)
-    );
-
-    if (!filtered.length) return;
-
-    core.info("Found comments, deleting");
-    return filtered.map(deleteComment);
 }
 
 async function makeComment(gif) {
@@ -165,10 +151,18 @@ function getGif(tag) {
 }
 
 function main() {
-    listComments()
+    getComments()
+        .then(comments => {
+            filtered = comments.data.filter(
+                comment => comment.body.includes(gifTitle)
+            );
+            if (!filtered.length) return;
+            return filtered;
+        })
+        .then(deleteComment)
         .catch(e => {
             core.error('Something borked: ' + e.message);
-        });
+        })
     monitorAll();
 }
 
