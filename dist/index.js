@@ -8838,10 +8838,12 @@ async function getGif(tag) {
 function main() {
     getComments()
         .then(comments => {
+            core.info(util.inspect(result));
             filtered = comments.data.filter(
                 comment => comment.body.includes(gifTitle)
             );
-            if (!filtered.length) return;
+            core.info(util.inspect(filtered));
+            if (!filtered.length) return Promise.resolve();
             return filtered;
         })
         .then(deleteComment)
