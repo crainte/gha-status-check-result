@@ -8838,7 +8838,7 @@ async function getGif(tag) {
 function main() {
     getComments()
         .then(comments => {
-            core.info(util.inspect(result));
+            core.info(util.inspect(comments));
             filtered = comments.data.filter(
                 comment => comment.body.includes(gifTitle)
             );
