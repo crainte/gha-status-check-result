@@ -140,11 +140,11 @@ async function listComments() {
     return filtered.map(deleteComment);
 }
 
-async function makeComment(tag) {
+function makeComment(tag) {
     core.info('Making comment');
-    const gif = await getGif(tag);
+    const gif = getGif(tag);
     core.info(util.inspect(gif));
-    return await octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
+    return octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
         body: `![${gifTitle}](${gif.image_url})`
     });
 }
