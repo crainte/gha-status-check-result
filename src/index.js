@@ -3,8 +3,8 @@ const github = require('@actions/github');
 const axios = require('axios');
 const util = require('util');
 
-const token = core.getInput('authToken') || process.env.GITHUB_TOKEN;
-const apiKey = core.getInput('apiKey') || "";
+const token = core.getInput('authToken');
+const apiKey = core.getInput('apiKey');
 const rating = core.getInput('rating') || "pg-13";
 const timeout = parseInt(core.getInput('timeout')) || 10000;
 const interval = parseInt(core.getInput('interval')) || 5000;
@@ -144,10 +144,12 @@ async function getGif(tag) {
     // be nice if I could force octokit to do this
     core.info("getGif");
     return await axios.get(giphyURL, {
-        tag: tag,
-        rating: rating,
-        fmt: "json",
-        api_key: apiKey
+        params: {
+            tag: tag,
+            rating: rating,
+            fmt: "json",
+            api_key: apiKey
+        }
     });
 }
 
