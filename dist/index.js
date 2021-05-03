@@ -8850,6 +8850,7 @@ function main() {
         .catch(e => {
             core.error('Something borked: ' + e.message);
         });
+    down();
     monitorAll();
 }
 
@@ -8877,7 +8878,6 @@ function giphy(tag) {
 main();
 
 setTimeout(() => {
-    down();
     core.setFailed("Maximum timeout reached");
     process.exit(1);
 }, timeout);
