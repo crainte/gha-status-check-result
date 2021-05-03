@@ -23,3 +23,4 @@ jobs:
         id: testing
         with:
           authToken: ${{ secrets.GITHUB_TOKEN }}
+          apiKey: ${{ secrets.GIPHY_API_KEY }}

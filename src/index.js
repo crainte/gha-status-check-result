@@ -1,8 +1,11 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
+const axios = require('axios');
 const util = require('util');
 
 const token = core.getInput('authToken') || process.env.GITHUB_TOKEN;
+const apiKey = core.getInput('apiKey') || "";
+const rating = core.getInput('rating') || "pg-13";
 const timeout = parseInt(core.getInput('timeout')) || 30000;
 const interval = parseInt(core.getInput('interval')) || 5000;
 const ctx = core.getInput('context') || null;
@@ -10,7 +13,8 @@ const ctx = core.getInput('context') || null;
 const octokit = github.getOctokit(token);
 const context = github.context;
 const repo = context.payload.repository.full_name;
-const gifTitle = "gha-status-check-result"
+const gifTitle = "gha-status-check-result";
+const giphyURL = "https://api.giphy.com/v1/gifs/random";
 
 core.info(util.inspect(context));
 
@@ -124,7 +128,7 @@ function deleteComment(comment) {
 
 async function listComments() {
     core.info("Loading comments");
-    const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/comments`);
+    const response = await octokit.request(`GET ${context.payload.repository.url}/issues/${context.number}/comments`);
 
     filtered = response.data.filter(
         comment => comment.body.includes(gifTitle)
@@ -136,10 +140,22 @@ async function listComments() {
     return Promise.all(filtered.map(deleteComment));
 }
 
-async function makeComment(url) {
-    return octokit.request(`POST ${context.payload.repository.url}/commits/${context.sha}/comments`, {
-        body: `![${gifTitle}](${url})`
+async function makeComment(tag) {
+    const gif = await getGif(tag);
+    core.info(util.inspect(gif));
+    return octokit.request(`POST ${context.payload.repository.url}/issues/${context.number}/comments`, {
+        body: `![${gifTitle}](${gif.image_url})`
     });
+}
+
+async function getGif(tag) {
+    return axios.get(giphyURL, {
+        tag: tag,
+        rating: rating,
+        fmt: "json",
+        api_key: api_key
+    })
+        .then(result => result.data.data);
 }
 
 async function main() {
@@ -151,5 +167,6 @@ main();
 
 setTimeout(() => {
     core.setFailed("Maximum timeout reached");
+    makeComment('thumbs-down');
     process.exit(1);
 }, timeout);
