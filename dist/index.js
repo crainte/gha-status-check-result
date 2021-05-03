@@ -8809,6 +8809,7 @@ async function reqStatus() {
 
 async function deleteComment(comment) {
     core.info('deleteComment');
+    if (!comment.length) return;
     return await octokit.request(`DELETE ${context.payload.repository.url}/comments/${comment.id}`);
 }
 
@@ -8836,21 +8837,19 @@ async function getGif(tag) {
 }
 
 function main() {
+    // close to working.. doesn't resolve properly
     getComments()
         .then(comments => {
-            filtered = comments.data.filter(
+            return filtered = comments.data.filter(
                 comment => comment.body.includes(gifTitle)
             );
-            if (!filtered.length) {
-                core.info('Attempt to resolve');
-                return Promise.resolve();
-            }
-            return filtered;
         })
         .then(deleteComment)
         .catch(e => {
             core.error('Something borked: ' + e.message);
         });
+
+    // nothing at all
     getGif('thumbs-down')
         .then(gif => {
             core.info(util.inspect(gif));
@@ -8861,8 +8860,10 @@ function main() {
             core.info(util.inspect(response));
         })
         .catch(e => {
+            core.info(util.inspect(e));
             core.error('Something broke: ' + e.message);
         })
+    // works
     monitorAll();
 }
 
