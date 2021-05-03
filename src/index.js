@@ -124,6 +124,9 @@ async function reqStatus() {
 
 async function deleteComment(comment) {
     core.info('deleteComment');
+    core.info(util.inspect(comment));
+    core.info('ID ' + comment.id);
+    core.info('URL ' + comment.url);
     if (!comment.length) return Promise.resolve();
     return await octokit.request(`DELETE ${context.payload.repository.url}/issues/comments/${comment.id}`);
 }
@@ -160,17 +163,16 @@ function main() {
             filtered = comments.data.filter(
                 comment => comment.body.includes(gifTitle)
             );
-            core.info(util.inspect(filtered));
             return filtered;
         })
         .then(deleteComment)
         .then(results => {
             return results;
         })
+        .then(() => down())
         .catch(e => {
             core.error('Something borked: ' + e.message);
         });
-    down();
     monitorAll();
 }
 
