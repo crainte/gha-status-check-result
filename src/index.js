@@ -166,7 +166,7 @@ function getGif(tag) {
         fmt: "json",
         api_key: apiKey
     })
-        .then(res => res.data.data)
+        .then(res => { return res.data.data })
         .catch(e => {
             core.error('Giphy said no: ' + e.message);
         });
@@ -183,10 +183,7 @@ function main() {
 main();
 
 setTimeout(() => {
-    processResult('thumbs-down')
-        .catch(e => {
-            core.error('Unable to post: ' + e.message);
-        });
+    processResult('thumbs-down');
     core.setFailed("Maximum timeout reached");
     process.exit(1);
 }, timeout);
