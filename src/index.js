@@ -158,7 +158,10 @@ function main() {
             filtered = comments.data.filter(
                 comment => comment.body.includes(gifTitle)
             );
-            return Promise.all(filtered.map(deleteComment));
+            return filtered;
+        })
+        .then(filtered => {
+            return filtered.map(deleteComment);
         })
         .then(result => {
             return result;
