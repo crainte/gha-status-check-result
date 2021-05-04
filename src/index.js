@@ -124,8 +124,6 @@ async function reqStatus() {
 
 async function deleteComment(comment) {
     core.info('deleteComment');
-    if (!comment.length) return Promise.resolve();
-    core.info('length is good');
     return await octokit.request(`DELETE ${comment.url}`);
 }
 
