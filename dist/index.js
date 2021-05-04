@@ -8744,7 +8744,7 @@ function monitorStatus() {
 }
 
 function monitorAll() {
-    let [status, check] = Promise.all([monitorStatus(), monitorChecks()]);
+    let [status, check] = new Promise.all([monitorStatus(), monitorChecks()]);
     return status && check;
 }
 
