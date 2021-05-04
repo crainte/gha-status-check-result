@@ -8743,8 +8743,8 @@ function monitorStatus() {
         });
 }
 
-async function monitorAll() {
-    let [status, check] = await Promise.all([monitorStatus(), monitorChecks()]);
+function monitorAll() {
+    let [status, check] = Promise.all([monitorStatus(), monitorChecks()]);
     return status && check;
 }
 
@@ -8823,7 +8823,6 @@ async function makeComment(gif) {
 
 async function getGif(tag) {
     // be nice if I could force octokit to do this
-    core.info("getGif");
     return await axios.get(giphyURL, {
         params: {
             tag: tag,
