@@ -8743,8 +8743,8 @@ function monitorStatus() {
         });
 }
 
-function monitorAll() {
-    let [status, check] = new Promise.all([monitorStatus(), monitorChecks()]);
+async function monitorAll() {
+    let [status, check] = await Promise.all([monitorStatus(), monitorChecks()]);
     return status && check;
 }
 
@@ -8850,14 +8850,13 @@ function main() {
         .catch(e => {
             core.error('Something borked: ' + e.message);
         });
-    monitorAll()
-        .then(result => {
-            if (result) {
-                up();
-            } else {
-                down();
-            }
-        })
+
+    const result = monitorAll();
+    if (result) {
+        up();
+    } else {
+        down();
+    }
 }
 
 function up() {
