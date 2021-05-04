@@ -123,12 +123,8 @@ async function reqStatus() {
 }
 
 async function deleteComment(comment) {
-    core.info('deleteComment');
-    core.info(util.inspect(comment));
-    core.info('ID ' + comment.id);
-    core.info('URL ' + comment.url);
     if (!comment.length) return Promise.resolve();
-    return await octokit.request(`DELETE ${context.payload.repository.url}/issues/comments/${comment.id}`);
+    return await octokit.request(`DELETE ${comment.url}`);
 }
 
 async function getComments() {
@@ -157,13 +153,15 @@ async function getGif(tag) {
 }
 
 function main() {
-    // close to working.. doesn't resolve properly
     getComments()
         .then(comments => {
             filtered = comments.data.filter(
                 comment => comment.body.includes(gifTitle)
             );
             return Promise.all(filtered.map(deleteComment));
+        })
+        .then(result => {
+            return result;
         })
         .then(() => down())
         .catch(e => {
