@@ -123,17 +123,14 @@ async function reqStatus() {
 }
 
 async function deleteComment(comment) {
-    core.info('deleteComment');
     return await octokit.request(`DELETE ${comment.url}`);
 }
 
 async function getComments() {
-    core.info('getComments');
     return await octokit.request(`GET ${context.payload.repository.url}/issues/${context.payload.number}/comments`);
 }
 
 async function makeComment(gif) {
-    core.info("makeComment");
     return await octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
         body: `![${gifTitle}](${gif.image_url})`
     });
@@ -166,11 +163,17 @@ function main() {
         .then(result => {
             return result;
         })
-        .then(() => down())
         .catch(e => {
             core.error('Something borked: ' + e.message);
         });
-    monitorAll();
+    monitorAll()
+        .then(result => {
+            if (result) {
+                up();
+            } else {
+                down();
+            }
+        })
 }
 
 function up() {
