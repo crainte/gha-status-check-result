@@ -8865,7 +8865,9 @@ function up() {
     giphy('thumbs-up');
 }
 function down() {
-    return new Promise(r => giphy('thumbs-down'));
+    Promise.resolve().then(() => {
+        giphy('thumbs-down');
+    })
 }
 function giphy(tag) {
     // nothing at all
