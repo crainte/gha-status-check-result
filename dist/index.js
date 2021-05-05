@@ -8743,11 +8743,11 @@ async function monitorAll() {
 
     while ( true ) {
 
-        monitorStatus();
-        monitorChecks();
+        await monitorStatus();
+        await monitorChecks();
 
-        //core.info("Sleeping");
-        //await new Promise(r => setTimeout(r, interval));
+        core.info("Sleeping");
+        await new Promise(r => setTimeout(r, interval));
     }
 }
 
