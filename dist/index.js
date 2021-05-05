@@ -8878,7 +8878,7 @@ function giphy(tag) {
         })
         .catch(e => {
             core.error('Something broke: ' + e.message);
-        })
+        });
 }
 
 main();
@@ -8897,9 +8897,16 @@ waitForResult
 
 
 setTimeout(() => {
-    giphy('thumbs-down')
-        .then(result => {
-            return result;
+    getGif(tag)
+        .then(gif => {
+            return gif.data.data;
+        })
+        .then(makeComment)
+        .then(response => {
+            return response;
+        })
+        .catch(e => {
+            core.error('Something broke: ' + e.message);
         });
     console.log("IN SET TIMMEOUT");
     core.error('Timed out waiting for results');
