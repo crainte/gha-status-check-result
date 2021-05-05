@@ -206,6 +206,8 @@ main();
 
 waitForResult
     .then((event) => {
+        console.log(event);
+        console.log(event.message);
         switch(event.message) {
             case "timeout":
                 return down();
