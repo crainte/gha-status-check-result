@@ -8862,7 +8862,7 @@ function main() {
 }
 
 function up() {
-    giphy('thumbs-up');
+    return giphy('thumbs-up');
 }
 function down() {
     Promise.resolve(giphy('thumbs-down'))
