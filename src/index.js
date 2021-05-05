@@ -212,7 +212,7 @@ waitForResult
 
 
 setTimeout(() => {
-    getGif(tag)
+    getGif('thumbs-down')
         .then(gif => {
             return gif.data.data;
         })
