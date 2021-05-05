@@ -8720,7 +8720,7 @@ function monitorChecks() {
     core.info("Monitoring for checks");
     reqChecks()
         .then(status => {
-            core.info("Waiting on checks");
+            core.info("No check results yet");
             return new Promise(resolve => setTimeout(resolve, interval)).then(
                 monitorChecks
             );
@@ -8731,7 +8731,7 @@ function monitorStatus() {
     core.info("Monitoring for statuses");
     reqStatus()
         .then(status => {
-            core.info("Waiting on status");
+            core.info("No status results yet");
             return new Promise(resolve => setTimeout(resolve, interval)).then(
                 monitorStatus
             );
@@ -8741,20 +8741,14 @@ function monitorStatus() {
 async function monitorAll() {
     //let [status, check] = await Promise.all([monitorStatus(), monitorChecks()]);
 
-    let now = new Date().getTime();
-    const end = now + timeout;
-
-    while ( now <= end ) {
+    while ( true ) {
 
         await monitorStatus();
         await monitorChecks();
 
-        core.info("Waiting");
+        core.info("Sleeping");
         await new Promise(r => setTimeout(r, interval));
-        now = new Date().getTime();
     }
-    core.setFailed("Timed out waiting for results");
-    return false;
 }
 
 async function reqChecks() {
@@ -8895,6 +8889,7 @@ waitForResult
     .catch(e => {
         down();
         core.error(e.message);
+        core.setFailed(e.message);
         process.exit(1);
     });
 
