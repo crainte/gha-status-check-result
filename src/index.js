@@ -181,9 +181,9 @@ function up() {
 async function down() {
     return await giphy('thumbs-down');
 }
-function giphy(tag) {
+async function giphy(tag) {
     // nothing at all
-    return getGif(tag)
+    return await getGif(tag)
         .then(gif => {
             return gif.data.data;
         })
@@ -204,9 +204,6 @@ waitForResult
         process.exit(0);
     })
     .catch(e => {
-        console.log("I AM HERE");
-        core.error(e.message);
-        core.setFailed(e.message);
         process.exit(1);
     });
 
@@ -224,6 +221,6 @@ setTimeout(() => {
             core.error('Something broke: ' + e.message);
         });
     console.log("IN SET TIMMEOUT");
-    core.error('Timed out waiting for results');
+    core.setFailed('Timed out waiting for results');
     bus.emit('failure', {message: 'Timed out waiting for results'});
 }, timeout);
