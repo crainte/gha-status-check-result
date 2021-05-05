@@ -182,13 +182,14 @@ function main() {
             core.error('Something borked: ' + e.message);
         });
 
-    const checks = monitorChecks();
-    const status = monitorStatus();
-    if (status && checks) {
-        return up();
-    } else {
-        return down();
-    }
+    monitorAll();
+    //const checks = monitorChecks();
+    //const status = monitorStatus();
+    //if (status && checks) {
+    //    return up();
+    //} else {
+    //    return down();
+    //}
 }
 
 function up() {
