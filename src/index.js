@@ -182,8 +182,9 @@ function main() {
             core.error('Something borked: ' + e.message);
         });
 
-    const result = monitorAll();
-    if (result) {
+    const checks = monitorChecks();
+    const status = monitorStatus();
+    if (status && checks) {
         return up();
     } else {
         return down();
@@ -211,5 +212,4 @@ function giphy(tag) {
         })
 }
 
-const fin = main();
-process.exit(fin);
+main();
