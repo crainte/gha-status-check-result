@@ -8750,12 +8750,12 @@ async function monitorAll() {
     const end = now + timeout;
 
     while ( now <= end ) {
-        //const status = monitorStatus();
-        //const checks = monitorChecks();
+        const status = monitorStatus();
+        const checks = monitorChecks();
 
-        //if ( status && checks ) {
-        //    return ((status == "SUCCESS") && (checks == "SUCCESS"));
-        //}
+        if ( status && checks ) {
+            return ((status == "SUCCESS") && (checks == "SUCCESS"));
+        }
         core.info("Waiting");
         await new Promise(r => setTimeout(r, interval));
         now = new Date().getTime();
