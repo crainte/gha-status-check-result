@@ -61,8 +61,8 @@ async function monitorAll() {
 
     while ( now <= end ) {
 
-        monitorStatus();
-        monitorChecks();
+        await monitorStatus();
+        await monitorChecks();
 
         core.info("Waiting");
         await new Promise(r => setTimeout(r, interval));
@@ -72,14 +72,10 @@ async function monitorAll() {
     return false;
 }
 
-async function getChecks() {
-    return await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/check-runs`);
-}
-
-function reqChecks() {
+async function reqChecks() {
     try {
         core.info("Requesting Checks");
-        const response = getChecks();
+        const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/check-runs`);
         const filtered = response.data.check_runs.filter( run => run.name !== context.action );
 
         // no checks besides self, wait for something
@@ -103,14 +99,10 @@ function reqChecks() {
     return;
 }
 
-async function getStatus() {
-    return await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/statuses`);
-}
-
-function reqStatus() {
+async function reqStatus() {
     try {
         core.info("Requesting Status");
-        const response = getStatus();
+        const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/statuses`);
 
         if (ctx) {
             // we are looking for a specific context
