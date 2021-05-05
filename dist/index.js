@@ -8870,6 +8870,7 @@ function main() {
     monitorAll()
         .then(response => {
             if(response) return up();
+            core.setFailed('Do not pass go');
             return down();
         })
         .then(() => process.exit(0))
