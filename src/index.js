@@ -204,6 +204,7 @@ waitForResult
         process.exit(0);
     })
     .catch(e => {
+        console.log("I AM HERE");
         core.error(e.message);
         core.setFailed(e.message);
         process.exit(1);
@@ -215,6 +216,7 @@ setTimeout(() => {
         .then(result => {
             return result;
         });
+    console.log("IN SET TIMMEOUT");
     core.error('Timed out waiting for results');
     bus.emit('failure', {message: 'Timed out waiting for results'});
 }, timeout);
