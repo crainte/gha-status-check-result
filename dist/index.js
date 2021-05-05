@@ -8747,17 +8747,19 @@ async function monitorAll() {
     //let [status, check] = await Promise.all([monitorStatus(), monitorChecks()]);
 
     let now = new Date().getTime();
-    const end = now + timeout * 1000;
+    const end = now + timeout;
 
     while ( now <= end ) {
-        const status = await monitorStatus();
-        const checks = await monitorChecks();
+        //const status = monitorStatus();
+        //const checks = monitorChecks();
 
-        if ( status && checks ) {
-            return ((status == "SUCCESS") && (checks == "SUCCESS"));
-        }
+        //if ( status && checks ) {
+        //    return ((status == "SUCCESS") && (checks == "SUCCESS"));
+        //}
         core.info("Waiting");
-        await setTimeout(() => resolve(), interval * 1000);
+        setTimeout(() => {
+            resolve('sleeping');
+        }, interval);
         now = new Date().getTime();
     }
     core.error("Timed out waiting for results");

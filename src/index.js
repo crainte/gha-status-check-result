@@ -58,23 +58,23 @@ function monitorStatus() {
         });
 }
 
-function monitorAll() {
+async function monitorAll() {
     //let [status, check] = await Promise.all([monitorStatus(), monitorChecks()]);
 
     let now = new Date().getTime();
-    const end = now + timeout * 1000;
+    const end = now + timeout;
 
     while ( now <= end ) {
-        const status = monitorStatus();
-        const checks = monitorChecks();
+        //const status = monitorStatus();
+        //const checks = monitorChecks();
 
-        if ( status && checks ) {
-            return ((status == "SUCCESS") && (checks == "SUCCESS"));
-        }
+        //if ( status && checks ) {
+        //    return ((status == "SUCCESS") && (checks == "SUCCESS"));
+        //}
         core.info("Waiting");
         setTimeout(() => {
             resolve('sleeping');
-        }, interval * 1000);
+        }, interval);
         now = new Date().getTime();
     }
     core.error("Timed out waiting for results");
