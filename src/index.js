@@ -217,7 +217,11 @@ function giphy(tag) {
         })
 }
 
-main();
+main()
+    .catch(e => {
+        core.error(e);
+        process.exit(1);
+    });
 
 setTimeout(() => {
     bus.emit('failure', {detail: 'Timed out waiting for results'});

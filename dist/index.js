@@ -8692,7 +8692,7 @@ const util = __nccwpck_require__(1669);
 const token = core.getInput('authToken');
 const apiKey = core.getInput('apiKey');
 const rating = core.getInput('rating') || "pg-13";
-const timeout = parseInt(core.getInput('timeout')) || 10000;
+const timeout = parseInt(core.getInput('timeout')) || 30000;
 const interval = parseInt(core.getInput('interval')) || 5000;
 const ctx = core.getInput('context') || null;
 
@@ -8902,7 +8902,11 @@ function giphy(tag) {
         })
 }
 
-main();
+main()
+    .catch(e => {
+        core.error(e);
+        process.exit(1);
+    });
 
 setTimeout(() => {
     bus.emit('failure', {detail: 'Timed out waiting for results'});
