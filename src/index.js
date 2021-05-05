@@ -58,15 +58,15 @@ function monitorStatus() {
         });
 }
 
-async function monitorAll() {
+function monitorAll() {
     //let [status, check] = await Promise.all([monitorStatus(), monitorChecks()]);
 
     let now = new Date().getTime();
     const end = now + timeout * 1000;
 
     while ( now <= end ) {
-        const status = await monitorStatus();
-        const checks = await monitorChecks();
+        const status = monitorStatus();
+        const checks = monitorChecks();
 
         if ( status && checks ) {
             return ((status == "SUCCESS") && (checks == "SUCCESS"));
