@@ -184,11 +184,9 @@ function main() {
 
     const result = monitorAll();
     if (result) {
-        up();
-        process.exit(0);
+        return up();
     } else {
-        down();
-        process.exit(1);
+        return down();
     }
 }
 
@@ -213,4 +211,10 @@ function giphy(tag) {
         })
 }
 
-main();
+main()
+    .then(fin => {
+        process.exit(fin);
+    })
+    .catch(e => {
+        core.error("Main loop died: " + e.message);
+    });
