@@ -8896,7 +8896,7 @@ waitForResult
 
 
 setTimeout(() => {
-    down()
+    giphy('thumbs-down')
         .then(result => {
             return result;
         });
