@@ -8899,6 +8899,9 @@ waitForResult
         }
     })
     .then(() => {
+        return
+    })
+    .then(() => {
         process.exit(0);
     })
     .catch(e => {
