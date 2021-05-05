@@ -213,8 +213,8 @@ waitForResult
                 return up();
         }
     })
-    .then(() => {
-        return
+    .then(result => {
+        return result;
     })
     .then(() => {
         process.exit(0);
@@ -225,7 +225,7 @@ waitForResult
 
 
 setTimeout(() => {
-    console.log("IN SET TIMMEOUT");
+    console.log("IN SET TIMEOUT");
     core.setFailed('Timed out waiting for results');
     bus.emit('failure', {message: 'timeout'});
 }, timeout);
