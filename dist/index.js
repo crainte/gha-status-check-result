@@ -8757,9 +8757,7 @@ async function monitorAll() {
         //    return ((status == "SUCCESS") && (checks == "SUCCESS"));
         //}
         core.info("Waiting");
-        setTimeout(() => {
-            resolve('sleeping');
-        }, interval);
+        await new Promise(r => setTimeout(r, interval));
         now = new Date().getTime();
     }
     core.error("Timed out waiting for results");
