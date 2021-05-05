@@ -7,7 +7,7 @@ const util = require('util');
 const token = core.getInput('authToken');
 const apiKey = core.getInput('apiKey');
 const rating = core.getInput('rating') || "pg-13";
-const timeout = parseInt(core.getInput('timeout')) || 30000;
+const timeout = parseInt(core.getInput('timeout')) || 20000;
 const interval = parseInt(core.getInput('interval')) || 5000;
 const ctx = core.getInput('context') || null;
 
@@ -22,13 +22,12 @@ const giphyURL = "https://api.giphy.com/v1/gifs/random";
 
 const waitForResult = new Promise((resolve, reject) => {
     bus.once('failure', (event) => {
-        core.error(event);
         down();
         reject(event);
     });
     bus.once('success', (event) => {
-        core.info(event);
-        resolve(up);
+        up();
+        resolve(event);
     });
 })
 
@@ -185,7 +184,7 @@ function main() {
         .catch(e => {
             core.error('Something borked: ' + e.message);
         });
-
+    monitorAll();
 }
 
 function up() {
@@ -212,8 +211,7 @@ function giphy(tag) {
 main();
 
 waitForResult
-    .then((callback) => {
-        callback();
+    .then(() => {
         process.exit(0);
     })
     .catch(e => {
