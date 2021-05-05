@@ -23,7 +23,7 @@ const giphyURL = "https://api.giphy.com/v1/gifs/random";
 const waitForResult = new Promise((resolve, reject) => {
     bus.once('failure', (event) => {
         down();
-        reject(event);
+        reject(event.message);
     });
     bus.once('success', (event) => {
         up();
@@ -84,7 +84,7 @@ async function reqChecks() {
         const failed = filtered.filter(
             run => run.status === "completed" && run.conclusion === "failure"
         );
-        if (failed.length) bus.emit('failure', {detail: 'Failure detected'});
+        if (failed.length) bus.emit('failure', {message: 'Failure detected'});
 
         const pending = filtered.filter(
             run => run.status === "queued" || run.status === "in_progress"
@@ -93,7 +93,7 @@ async function reqChecks() {
 
     } catch (error) {
         core.error(error);
-        bus.emit('failure', {detail: 'Failure in processing'});
+        bus.emit('failure', {message: 'Failure in processing'});
     }
     // TODO
     return;
@@ -118,7 +118,7 @@ async function reqStatus() {
         const failed = filtered.filter(
             run => run.state === "failure"
         );
-        if (failed.length) bus.emit('failure', {detail: 'Failure detected'});
+        if (failed.length) bus.emit('failure', {message: 'Failure detected'});
 
         const pending = filtered.filter(
             run => run.state === "pending"
@@ -127,7 +127,7 @@ async function reqStatus() {
 
     } catch (error) {
         core.error(error);
-        bus.emit('failure', {detail: 'Failure in processing'});
+        bus.emit('failure', {message: 'Failure in processing'});
     }
     // TODO
     return;
@@ -204,14 +204,16 @@ main();
 
 waitForResult
     .then(() => {
+        up();
         process.exit(0);
     })
     .catch(e => {
-        core.error(e);
+        down();
+        core.error(e.message);
         process.exit(1);
     });
 
 
 setTimeout(() => {
-    bus.emit('failure', {detail: 'Timed out waiting for results'});
+    bus.emit('failure', {message: 'Timed out waiting for results'});
 }, timeout);
