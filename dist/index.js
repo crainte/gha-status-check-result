@@ -8890,10 +8890,13 @@ function giphy(tag) {
 main();
 
 waitForResult
-    .then(() => up())
-    .then(() => {
-        console.log("updoot");
-        return
+    .then((event) => {
+        switch(event.message) {
+            case "timeout":
+                return down();
+            case "success":
+                return up();
+        }
     })
     .then(() => {
         process.exit(0);
@@ -8904,10 +8907,9 @@ waitForResult
 
 
 setTimeout(() => {
-    down();
     console.log("IN SET TIMMEOUT");
     core.setFailed('Timed out waiting for results');
-    bus.emit('error', {message: 'Timed out waiting for results'});
+    bus.emit('failure', {message: 'timeout'});
 }, timeout);
 
 })();
