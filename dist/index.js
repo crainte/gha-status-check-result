@@ -8902,11 +8902,7 @@ function giphy(tag) {
         })
 }
 
-main()
-    .catch(e => {
-        core.error(e);
-        process.exit(1);
-    });
+main();
 
 setTimeout(() => {
     bus.emit('failure', {detail: 'Timed out waiting for results'});
