@@ -75,8 +75,9 @@ async function monitorAll() {
         await new Promise(r => setTimeout(r, interval));
         now = new Date().getTime();
     }
-    core.error("Timed out waiting for results");
-    return false;
+    core.setFailed("Timed out waiting for results");
+    // should be neutral error code
+    process.exit(78);
 }
 
 async function reqChecks() {
@@ -182,16 +183,14 @@ function main() {
             core.error('Something borked: ' + e.message);
         });
 
-    monitorAll()
-        .then(response => {
-            if(response) return up();
-            core.setFailed('Do not pass go');
-            return down();
-        })
-        .then(() => process.exit(0))
-        .catch(e => {
-            core.error("Something broke: " + e.message);
-        });
+    const result = monitorAll();
+    if (result) {
+        up();
+        process.exit(0);
+    } else {
+        down();
+        process.exit(1);
+    }
 }
 
 function up() {
