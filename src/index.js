@@ -61,8 +61,8 @@ async function monitorAll() {
         monitorStatus();
         monitorChecks();
 
-        core.info("Sleeping");
-        await new Promise(r => setTimeout(r, interval));
+        //core.info("Sleeping");
+        //await new Promise(r => setTimeout(r, interval));
     }
 }
 
@@ -172,21 +172,7 @@ function main() {
         .catch(e => {
             core.error('Something borked: ' + e.message);
         });
-
-    monitorStatus()
-        .then(response => {
-            return response;
-        })
-        .catch(e => {
-            core.error('Status failed: ' + e.message);
-        });
-    monitorChecks()
-        .then(response => {
-            return response;
-        })
-        .catch(e => {
-            core.error('Check failed: ' + e.message);
-        });
+    monitorAll();
 }
 
 function up() {
