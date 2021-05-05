@@ -205,7 +205,7 @@ function giphy(tag) {
 main();
 
 waitForResult
-    .then(() => down())
+    .then(() => up())
     .then(() => {
         console.log("updoot");
         return
