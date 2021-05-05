@@ -211,10 +211,5 @@ function giphy(tag) {
         })
 }
 
-main()
-    .then(fin => {
-        process.exit(fin);
-    })
-    .catch(e => {
-        core.error("Main loop died: " + e.message);
-    });
+const fin = main();
+process.exit(fin);
