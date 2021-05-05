@@ -7,7 +7,7 @@ const util = require('util');
 const token = core.getInput('authToken');
 const apiKey = core.getInput('apiKey');
 const rating = core.getInput('rating') || "pg-13";
-const timeout = parseInt(core.getInput('timeout')) || 20000;
+const timeout = parseInt(core.getInput('timeout')) || 10000;
 const interval = parseInt(core.getInput('interval')) || 5000;
 const ctx = core.getInput('context') || null;
 
@@ -22,7 +22,7 @@ const giphyURL = "https://api.giphy.com/v1/gifs/random";
 
 const waitForResult = new Promise((resolve, reject) => {
     bus.once('failure', (event) => {
-        reject(event.message);
+        resolve(event.message);
     });
     bus.once('success', (event) => {
         resolve(event.message);
