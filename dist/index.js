@@ -8706,6 +8706,9 @@ const giphyURL = "https://api.giphy.com/v1/gifs/random";
 //core.info(util.inspect(context));
 
 const waitForResult = new Promise((resolve, reject) => {
+    bus.once('error', (event) => {
+        reject(event.message);
+    });
     bus.once('failure', (event) => {
         resolve(event.message);
     });
@@ -8865,10 +8868,7 @@ function up() {
     return giphy('thumbs-up');
 }
 function down() {
-    Promise.resolve(giphy('thumbs-down'))
-        .then(() => {
-            console.log("Down");
-        });
+    return giphy('thumbs-down');
 }
 function giphy(tag) {
     // nothing at all
@@ -8904,6 +8904,7 @@ waitForResult
 
 
 setTimeout(() => {
+    down();
     console.log("IN SET TIMMEOUT");
     core.setFailed('Timed out waiting for results');
     bus.emit('failure', {message: 'Timed out waiting for results'});
