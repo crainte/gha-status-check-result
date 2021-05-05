@@ -179,8 +179,8 @@ function main() {
 function up() {
     giphy('thumbs-up');
 }
-async function down() {
-    await new Promise(r => giphy('thumbs-down'));
+function down() {
+    return new Promise(r => giphy('thumbs-down'));
 }
 async function giphy(tag) {
     // nothing at all
