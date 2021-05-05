@@ -22,7 +22,7 @@ const giphyURL = "https://api.giphy.com/v1/gifs/random";
 
 const waitForResult = new Promise((resolve, reject) => {
     bus.once('failure', (event) => {
-        reject(event.message);
+        resolve(event.message);
     });
     bus.once('success', (event) => {
         resolve(event.message);
@@ -205,7 +205,7 @@ function giphy(tag) {
 main();
 
 waitForResult
-    .then(() => up())
+    .then(() => down())
     .then(() => {
         console.log("updoot");
         return
