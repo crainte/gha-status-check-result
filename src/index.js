@@ -210,5 +210,6 @@ waitForResult
 
 
 setTimeout(() => {
+    down();
     bus.emit('failure', {message: 'Timed out waiting for results'});
 }, timeout);
