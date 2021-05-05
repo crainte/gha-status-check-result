@@ -22,12 +22,10 @@ const giphyURL = "https://api.giphy.com/v1/gifs/random";
 
 const waitForResult = new Promise((resolve, reject) => {
     bus.once('failure', (event) => {
-        down();
         reject(event.message);
     });
     bus.once('success', (event) => {
-        up();
-        resolve(event);
+        resolve(event.message);
     });
 })
 
@@ -58,8 +56,10 @@ async function monitorAll() {
 
     while ( true ) {
 
-        await monitorStatus();
-        await monitorChecks();
+        //await monitorStatus();
+        //await monitorChecks();
+        reqChecks();
+        reqStatus();
 
         core.info("Sleeping");
         await new Promise(r => setTimeout(r, interval));
@@ -178,8 +178,8 @@ function main() {
 function up() {
     giphy('thumbs-up');
 }
-function down() {
-    giphy('thumbs-down');
+async function down() {
+    return await giphy('thumbs-down');
 }
 function giphy(tag) {
     // nothing at all
@@ -204,7 +204,6 @@ waitForResult
         process.exit(0);
     })
     .catch(e => {
-        down();
         core.error(e.message);
         core.setFailed(e.message);
         process.exit(1);
@@ -213,5 +212,6 @@ waitForResult
 
 setTimeout(() => {
     down();
+    core.error('Timed out waiting for results');
     bus.emit('failure', {message: 'Timed out waiting for results'});
 }, timeout);
