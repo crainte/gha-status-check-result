@@ -222,5 +222,5 @@ setTimeout(() => {
     down();
     console.log("IN SET TIMMEOUT");
     core.setFailed('Timed out waiting for results');
-    bus.emit('failure', {message: 'Timed out waiting for results'});
+    bus.emit('error', {message: 'Timed out waiting for results'});
 }, timeout);
