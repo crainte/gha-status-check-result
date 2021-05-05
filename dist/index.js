@@ -8761,8 +8761,7 @@ async function monitorAll() {
         now = new Date().getTime();
     }
     core.setFailed("Timed out waiting for results");
-    // should be neutral error code
-    process.exit(78);
+    return false;
 }
 
 async function reqChecks() {
