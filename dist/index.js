@@ -8821,6 +8821,7 @@ async function getComments() {
 }
 
 async function makeComment(gif) {
+    console.log("make comment");
     return await octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
         body: `![${gifTitle}](${gif.image_url})`
     });
@@ -8870,10 +8871,12 @@ async function giphy(tag) {
     // nothing at all
     return await getGif(tag)
         .then(gif => {
+            console.log("get gif");
             return gif.data.data;
         })
         .then(makeComment)
         .then(response => {
+            console.log("gif response");
             return response;
         })
         .catch(e => {
@@ -8894,17 +8897,7 @@ waitForResult
 
 
 setTimeout(() => {
-    getGif('thumbs-down')
-        .then(gif => {
-            return gif.data.data;
-        })
-        .then(makeComment)
-        .then(response => {
-            return response;
-        })
-        .catch(e => {
-            core.error('Something broke: ' + e.message);
-        });
+    down();
     console.log("IN SET TIMMEOUT");
     core.setFailed('Timed out waiting for results');
     bus.emit('failure', {message: 'Timed out waiting for results'});
