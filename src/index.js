@@ -180,9 +180,10 @@ function up() {
     giphy('thumbs-up');
 }
 function down() {
-    Promise.resolve().then(() => {
-        giphy('thumbs-down');
-    })
+    Promise.resolve(giphy('thumbs-down'))
+        .then(() => {
+            console.log("Down");
+        });
 }
 function giphy(tag) {
     // nothing at all
