@@ -8710,10 +8710,10 @@ function monitorChecks() {
             switch (status) {
                 case "FAILURE":
                     core.error("We have a failure");
-                    return 1;
+                    return "FAILURE";
                 case "SUCCESS":
                     core.info("We have a success");
-                    return;
+                    return "SUCCESS";
                 case "IN_PROGRESS":
                     core.info("Waiting on checks");
                     return new Promise(resolve => setTimeout(resolve, interval)).then(
@@ -8730,10 +8730,10 @@ function monitorStatus() {
             switch (status) {
                 case "FAILURE":
                     core.error("We detected a failed status");
-                    return 1;
+                    return "FAILURE";
                 case "SUCCESS":
                     core.info("We have a success");
-                    return;
+                    return "SUCCESS";
                 case "IN_PROGRESS":
                     core.info("Waiting on status");
                     return new Promise(resolve => setTimeout(resolve, interval)).then(
@@ -8744,8 +8744,24 @@ function monitorStatus() {
 }
 
 async function monitorAll() {
-    let [status, check] = await Promise.all([monitorStatus(), monitorChecks()]);
-    return status && check;
+    //let [status, check] = await Promise.all([monitorStatus(), monitorChecks()]);
+
+    let now = new Date().getTime();
+    const end = now + timeout * 1000;
+
+    while ( now <= end ) {
+        const status = await monitorStatus();
+        const checks = await monitorChecks();
+
+        if ( status && checks ) {
+            return ((status == "SUCCESS") && (checks == "SUCCESS"));
+        }
+        core.info("Waiting");
+        await setTimeout(() => resolve(), interval * 1000);
+        now = new Date().getTime();
+    }
+    core.error("Timed out waiting for results");
+    return false;
 }
 
 async function reqChecks() {
@@ -8881,11 +8897,6 @@ function giphy(tag) {
 }
 
 main();
-
-setTimeout(() => {
-    core.setFailed("Maximum timeout reached");
-    process.exit(1);
-}, timeout);
 
 })();
 
