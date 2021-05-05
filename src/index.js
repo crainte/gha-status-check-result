@@ -182,12 +182,15 @@ function main() {
             core.error('Something borked: ' + e.message);
         });
 
-    const result = monitorAll();
-    if (result) {
-        up();
-    } else {
-        down();
-    }
+    monitorAll()
+        .then(response => {
+            if(response) return up();
+            return down();
+        })
+        .then(() => process.exit(0))
+        .catch(e => {
+            core.error("Something broke: " + e.message);
+        });
 }
 
 function up() {
