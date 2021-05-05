@@ -8893,7 +8893,7 @@ waitForResult
     .then((event) => {
         switch(event) {
             case "timeout":
-                return down();
+                return Promise.reject(down());
             case "success":
                 return up();
         }
@@ -8910,7 +8910,6 @@ waitForResult
 
 
 setTimeout(() => {
-    console.log("IN SET TIMEOUT");
     core.setFailed('Timed out waiting for results');
     bus.emit('failure', {message: 'timeout'});
 }, timeout);
