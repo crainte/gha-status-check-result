@@ -8870,15 +8870,6 @@ function main() {
             core.error('Something borked: ' + e.message);
         });
 
-    waitForResult
-        .then((callback) => {
-            callback();
-            process.exit(0);
-        })
-        .catch(e => {
-            core.error(e);
-            process.exit(1);
-        });
 }
 
 function up() {
@@ -8903,6 +8894,17 @@ function giphy(tag) {
 }
 
 main();
+
+waitForResult
+    .then((callback) => {
+        callback();
+        process.exit(0);
+    })
+    .catch(e => {
+        core.error(e);
+        process.exit(1);
+    });
+
 
 setTimeout(() => {
     bus.emit('failure', {detail: 'Timed out waiting for results'});
