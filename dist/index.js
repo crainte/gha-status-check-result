@@ -8708,7 +8708,8 @@ const giphyURL = "https://api.giphy.com/v1/gifs/random";
 const waitForResult = new Promise((resolve, reject) => {
     bus.once('failure', (event) => {
         core.error(event);
-        reject(down);
+        down();
+        reject(event);
     });
     bus.once('success', (event) => {
         core.info(event);
