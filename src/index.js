@@ -58,8 +58,8 @@ async function monitorAll() {
 
     while ( true ) {
 
-        await monitorStatus();
-        await monitorChecks();
+        monitorStatus();
+        monitorChecks();
 
         core.info("Sleeping");
         await new Promise(r => setTimeout(r, interval));
@@ -156,12 +156,14 @@ async function getGif(tag) {
 function main() {
     getComments()
         .then(comments => {
+            core.info('Processing comments');
             filtered = comments.data.filter(
                 comment => comment.body.includes(gifTitle)
             );
             return filtered;
         })
         .then(filtered => {
+            core.info('Deleting comments');
             return filtered.map(deleteComment);
         })
         .then(result => {
@@ -170,7 +172,21 @@ function main() {
         .catch(e => {
             core.error('Something borked: ' + e.message);
         });
-    monitorAll();
+
+    monitorStatus()
+        .then(response => {
+            return response;
+        })
+        .catch(e => {
+            core.error('Status failed: ' + e.message);
+        });
+    monitorChecks()
+        .then(response => {
+            return response;
+        })
+        .catch(e => {
+            core.error('Check failed: ' + e.message);
+        });
 }
 
 function up() {
