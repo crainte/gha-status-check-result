@@ -182,9 +182,9 @@ function up() {
 function down() {
     return new Promise(r => giphy('thumbs-down'));
 }
-async function giphy(tag) {
+function giphy(tag) {
     // nothing at all
-    return await getGif(tag)
+    return getGif(tag)
         .then(gif => {
             console.log("get gif");
             return gif.data.data;
