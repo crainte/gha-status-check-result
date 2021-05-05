@@ -211,7 +211,10 @@ waitForResult
 
 
 setTimeout(() => {
-    down();
+    down()
+        .then(result => {
+            return result;
+        });
     core.error('Timed out waiting for results');
     bus.emit('failure', {message: 'Timed out waiting for results'});
 }, timeout);
