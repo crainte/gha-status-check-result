@@ -36,8 +36,8 @@ async function monitorAll() {
 
     while ( true ) {
 
-        reqChecks();
-        reqStatus();
+        await reqChecks();
+        await reqStatus();
 
         core.info("Sleeping");
         await new Promise(r => setTimeout(r, interval));
