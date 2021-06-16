@@ -8733,6 +8733,7 @@ async function reqChecks() {
     try {
         core.info("Requesting Checks");
         const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/check-runs`);
+        core.info(response);
         //const filtered = response.data.check_runs.filter( run => run.name !== context.action );
         const filtered = response.data.check_runs.filter( run => run.name !== 'fake' );
 
@@ -8767,6 +8768,7 @@ async function reqStatus() {
     try {
         core.info("Requesting Status");
         const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/statuses`);
+        core.info(response);
 
         if (ctx) {
             // we are looking for a specific context
