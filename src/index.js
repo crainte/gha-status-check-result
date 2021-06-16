@@ -18,7 +18,7 @@ const repo = context.payload.repository.full_name;
 const gifTitle = "gha-status-check-result";
 const giphyURL = "https://api.giphy.com/v1/gifs/random";
 
-//core.info(util.inspect(context));
+core.info(util.inspect(context));
 
 const waitForResult = new Promise((resolve, reject) => {
     bus.once('error', (event) => {
@@ -47,7 +47,7 @@ async function monitorAll() {
 async function reqChecks() {
     try {
         core.info("Requesting Checks");
-        const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/check-runs`);
+        const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.pull_request.head.sha}/check-runs`);
         core.info(util.inspect(response));
         //const filtered = response.data.check_runs.filter( run => run.name !== context.action );
         const filtered = response.data.check_runs.filter( run => run.name !== 'fake' );
@@ -82,7 +82,7 @@ async function reqChecks() {
 async function reqStatus() {
     try {
         core.info("Requesting Status");
-        const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/statuses`);
+        const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.pull_request.head.sha}/statuses`);
         core.info(response.data);
 
         if (ctx) {
