@@ -7,7 +7,7 @@ const util = require('util');
 const token = core.getInput('authToken');
 const apiKey = core.getInput('apiKey');
 const rating = core.getInput('rating') || "pg-13";
-const timeout = parseInt(core.getInput('timeout')) || 10000;
+const timeout = parseInt(core.getInput('timeout')) || 30000;
 const interval = parseInt(core.getInput('interval')) || 5000;
 const ctx = core.getInput('context') || null;
 
