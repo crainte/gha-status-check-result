@@ -8717,35 +8717,10 @@ const waitForResult = new Promise((resolve, reject) => {
     });
 })
 
-function monitorChecks() {
-    core.info("Monitoring for checks");
-    reqChecks()
-        .then(status => {
-            core.info("No check results yet");
-            return new Promise(resolve => setTimeout(resolve, interval)).then(
-                monitorChecks
-            );
-        });
-}
-
-function monitorStatus() {
-    core.info("Monitoring for statuses");
-    reqStatus()
-        .then(status => {
-            core.info("No status results yet");
-            return new Promise(resolve => setTimeout(resolve, interval)).then(
-                monitorStatus
-            );
-        });
-}
-
 async function monitorAll() {
-    //let [status, check] = await Promise.all([monitorStatus(), monitorChecks()]);
 
     while ( true ) {
 
-        //await monitorStatus();
-        //await monitorChecks();
         reqChecks();
         reqStatus();
 
@@ -8762,7 +8737,10 @@ async function reqChecks() {
         const filtered = response.data.check_runs.filter( run => run.name !== 'fake' );
 
         // no checks besides self, wait for something
-        if (!filtered.length) return;
+        if (!filtered.length) {
+            core.info("No checks worth watching");
+            return;
+        }
 
         const failed = filtered.filter(
             run => run.status === "completed" && run.conclusion === "failure"
@@ -8772,13 +8750,16 @@ async function reqChecks() {
         const pending = filtered.filter(
             run => run.status === "queued" || run.status === "in_progress"
         );
-        if (pending.length) return;
+        if (pending.length) {
+            core.info(`We are waiting on ${pending.length} checks`);
+            return;
+        }
 
     } catch (error) {
         core.error(error);
         bus.emit('failure', {message: 'Failure in processing'});
     }
-    // TODO
+    core.info("Made it to the end of Checks");
     return;
 }
 
@@ -8796,7 +8777,10 @@ async function reqStatus() {
             filtered = response.data;
         }
 
-        if (!filtered.length) return;
+        if (!filtered.length) {
+            core.info("No status worth watching");
+            return;
+        }
 
         const failed = filtered.filter(
             run => run.state === "failure"
@@ -8806,13 +8790,16 @@ async function reqStatus() {
         const pending = filtered.filter(
             run => run.state === "pending"
         );
-        if (pending.length) return;
+        if (pending.length) {
+            core.info(`We are waiting on ${pending.length} status`);
+            return;
+        }
 
     } catch (error) {
         core.error(error);
         bus.emit('failure', {message: 'Failure in processing'});
     }
-    // TODO
+    core.info("Made it to the end of Status");
     return;
 }
 
