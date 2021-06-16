@@ -24,6 +24,13 @@ jobs:
   self:
     runs-on: ubuntu-latest
     steps:
+      - name: Waiting
+        id: waiting
+        uses: "WyriHaximus/github-action-wait-for-status@v2"
+        with:
+          ignoreActions: self
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Testing self
         uses: crainte/gha-status-check-result@main
         id: testing
