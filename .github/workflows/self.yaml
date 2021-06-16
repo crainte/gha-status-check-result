@@ -15,6 +15,14 @@ on:
   status: {}
 
 jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: microsoft/DevSkim-Action@v1
+      - uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: devskim-results.sarif
   self:
     runs-on: ubuntu-latest
     steps:
