@@ -8721,8 +8721,8 @@ async function monitorAll() {
 
     while ( true ) {
 
-        await reqChecks();
-        await reqStatus();
+        reqChecks();
+        reqStatus();
 
         core.info("Sleeping");
         await new Promise(r => setTimeout(r, interval));
