@@ -21,18 +21,12 @@ jobs:
       - uses: actions/checkout@v2
       - uses: max/secret-scan@master
 
-  giphy:
+  self:
     runs-on: ubuntu-latest
     steps:
-      - name: Waiting
-        id: waiting
-        uses: "WyriHaximus/github-action-wait-for-status@v1.3.1"
+      - name: Testing self
+        uses: crainte/gha-status-check-result@main
+        id: testing
         with:
-          ignoreActions: giphy
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Status Giphy
-        uses: jzweifel/pr-status-giphy-action@master
-        env:
-          GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          authToken: ${{ secrets.GITHUB_TOKEN }}
+          apiKey: ${{ secrets.GIPHY_API_KEY }}
