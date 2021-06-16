@@ -8692,7 +8692,7 @@ const util = __nccwpck_require__(1669);
 const token = core.getInput('authToken');
 const apiKey = core.getInput('apiKey');
 const rating = core.getInput('rating') || "pg-13";
-const timeout = parseInt(core.getInput('timeout')) || 10000;
+const timeout = parseInt(core.getInput('timeout')) || 30000;
 const interval = parseInt(core.getInput('interval')) || 5000;
 const ctx = core.getInput('context') || null;
 
@@ -8758,7 +8758,8 @@ async function reqChecks() {
     try {
         core.info("Requesting Checks");
         const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.sha}/check-runs`);
-        const filtered = response.data.check_runs.filter( run => run.name !== context.action );
+        //const filtered = response.data.check_runs.filter( run => run.name !== context.action );
+        const filtered = response.data.check_runs.filter( run => run.name !== 'fake' );
 
         // no checks besides self, wait for something
         if (!filtered.length) return;
