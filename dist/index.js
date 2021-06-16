@@ -8703,7 +8703,7 @@ const repo = context.payload.repository.full_name;
 const gifTitle = "gha-status-check-result";
 const giphyURL = "https://api.giphy.com/v1/gifs/random";
 
-//core.info(util.inspect(context));
+core.info(util.inspect(context));
 
 const waitForResult = new Promise((resolve, reject) => {
     bus.once('error', (event) => {
