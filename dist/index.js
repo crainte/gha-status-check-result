@@ -8795,6 +8795,7 @@ async function reqStatus() {
             core.info("No status worth watching");
             return;
         }
+        core.debug(util.inspect(filtered));
 
         const failed = filtered.filter(
             run => run.state === "failure"
