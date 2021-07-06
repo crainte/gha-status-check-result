@@ -18,8 +18,8 @@ const repo = context.payload.repository.full_name;
 const gifTitle = "gha-status-check-result";
 const giphyURL = "https://api.giphy.com/v1/gifs/random";
 
-status_pending = 0;
-checks_pending = 0;
+status_pending = undefined;
+checks_pending = undefined;
 
 core.debug(util.inspect(context));
 
@@ -42,7 +42,7 @@ async function monitorAll() {
         reqChecks()
             .then(result => {
                 checks_pending = result;
-                if ( !status_pending ) {
+                if ( typeof status_pending !== 'undefined' && !status_pending ) {
                     bus.emit('success', {message: 'success'});
                 }
             });
@@ -50,7 +50,7 @@ async function monitorAll() {
         reqStatus()
             .then(result => {
                 status_pending = result;
-                if ( !checks_pending ) {
+                if ( typeof checks_pending !== 'undefined' && !checks_pending ) {
                     bus.emit('success', {message: 'success'});
                 }
             });
