@@ -8757,7 +8757,6 @@ async function reqChecks() {
             run => run.status === "completed" && run.conclusion === "failure"
         );
         if (failed.length) bus.emit('failure', {message: 'failure'});
-        bus.emit('failure', {message: 'failure'});
 
         const pending = filtered.filter(
             run => run.status === "queued" || run.status === "in_progress"
