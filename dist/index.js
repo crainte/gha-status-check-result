@@ -8724,21 +8724,8 @@ async function monitorAll() {
 
     while ( true ) {
 
-        reqChecks()
-            .then(result => {
-                checks_pending = result;
-                if ( typeof status_pending !== 'undefined' && !status_pending ) {
-                    bus.emit('success', {message: 'success'});
-                }
-            });
-
-        reqStatus()
-            .then(result => {
-                status_pending = result;
-                if ( typeof checks_pending !== 'undefined' && !checks_pending ) {
-                    bus.emit('success', {message: 'success'});
-                }
-            });
+        reqChecks();
+        reqStatus();
 
         core.info(`Sleeping ${interval} ms`);
         await new Promise(r => setTimeout(r, interval));
@@ -8754,7 +8741,7 @@ async function reqChecks() {
         // no checks besides self, wait for something
         if (!filtered.length) {
             core.info("No checks worth watching");
-            return 0;
+            return;
         }
 
         const failed = filtered.filter(
@@ -8766,18 +8753,21 @@ async function reqChecks() {
             run => run.status === "queued" || run.status === "in_progress"
         );
         if (pending.length) {
+            checks_pending = pending.length;
             core.info(`We are waiting on ${pending.length} checks`);
-            return pending.length;
-        } else {
-            return 0;
+            return;
         }
 
     } catch (error) {
         core.error(error);
         bus.emit('failure', {message: 'Failure in processing'});
     }
+
+    if ( typeof status_pending !== 'undefined' && !status_pending ) {
+        bus.emit('success', {message: 'success'});
+    }
     core.debug("Made it to the end of Checks");
-    return 0;
+    return;
 }
 
 async function reqStatus() {
@@ -8796,7 +8786,7 @@ async function reqStatus() {
 
         if (!filtered.length) {
             core.info("No status worth watching");
-            return 0;
+            return;
         }
         core.debug(util.inspect(filtered));
 
@@ -8809,18 +8799,21 @@ async function reqStatus() {
             run => run.state === "pending"
         );
         if (pending.length) {
+            status_pending = pending.length;
             core.info(`We are waiting on ${pending.length} status`);
-            return pending.length;
-        } else {
-            return 0;
+            return;
         }
 
     } catch (error) {
         core.error(error);
         bus.emit('failure', {message: 'Failure in processing'});
     }
+
+    if ( typeof checks_pending !== 'undefined' && !checks_pending ) {
+            bus.emit('success', {message: 'success'});
+    }
     core.debug("Made it to the end of Status");
-    return 0;
+    return;
 }
 
 async function deleteComment(comment) {
