@@ -82,6 +82,7 @@ async function reqChecks() {
         bus.emit('success', {message: 'success'});
     }
     core.debug("Made it to the end of Checks");
+    checks_pending = 0;
     return;
 }
 
@@ -103,7 +104,6 @@ async function reqStatus() {
             core.info("No status worth watching");
             return;
         }
-        core.debug(util.inspect(filtered));
 
         const failed = filtered.filter(
             run => run.state === "failure"
@@ -128,6 +128,7 @@ async function reqStatus() {
             bus.emit('success', {message: 'success'});
     }
     core.debug("Made it to the end of Status");
+    status_pending = 0;
     return;
 }
 
