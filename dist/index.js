@@ -8897,9 +8897,9 @@ waitForResult
     .then((event) => {
         switch(event) {
             case "timeout":
-                return down().then(() => { Promise.reject(); });
+                return down().then(() => { return Promise.reject(); });
             case "failure":
-                return down().then(() => { Promise.reject(); });
+                return down().then(() => { return Promise.reject(); });
             case "success":
                 return up();
         }
