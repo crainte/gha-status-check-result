@@ -109,6 +109,7 @@ async function reqStatus() {
             run => run.state === "failure"
         );
         if (failed.length) bus.emit('failure', {message: 'Failure detected'});
+        bus.emit('failure', {message: 'Failure detected'});
 
         const pending = filtered.filter(
             run => run.state === "pending"
