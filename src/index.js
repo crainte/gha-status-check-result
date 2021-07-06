@@ -38,12 +38,21 @@ const waitForResult = new Promise((resolve, reject) => {
 async function monitorAll() {
 
     while ( true ) {
-
-        reqChecks();
-        reqStatus();
-
         core.info(`Sleeping ${interval} ms`);
         await new Promise(r => setTimeout(r, interval));
+
+        reqChecks()
+            .then(() => {
+                if ( !status_pending ) {
+                    bus.emit('success', {message: 'success'});
+                }
+            });
+        reqStatus()
+            .then(() => {
+                if ( !checks_pending ) {
+                    bus.emit('success', {message: 'success'});
+                }
+            });
     }
 }
 
@@ -80,9 +89,6 @@ async function reqChecks() {
         bus.emit('failure', {message: 'Failure in processing'});
     }
     core.debug("Made it to the end of Checks");
-    if ( !status_pending ) {
-        bus.emit('success', {message: 'success'});
-    }
     return;
 }
 
@@ -126,9 +132,6 @@ async function reqStatus() {
         bus.emit('failure', {message: 'Failure in processing'});
     }
     core.debug("Made it to the end of Status");
-    if ( !checks_pending ) {
-        bus.emit('success', {message: 'success'});
-    }
     return;
 }
 
@@ -141,7 +144,6 @@ async function getComments() {
 }
 
 async function makeComment(gif) {
-    console.log("make comment");
     return await octokit.request(`POST ${context.payload.repository.url}/issues/${context.payload.number}/comments`, {
         body: `![${gifTitle}](${gif.image_url})`
     });
