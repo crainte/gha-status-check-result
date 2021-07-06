@@ -49,8 +49,7 @@ async function reqChecks() {
         core.info("Requesting Checks");
         const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.payload.pull_request.head.sha}/check-runs`);
         core.info(util.inspect(response));
-        //const filtered = response.data.check_runs.filter( run => run.name !== context.action );
-        const filtered = response.data.check_runs.filter( run => run.name !== 'fake' );
+        const filtered = response.data.check_runs.filter( run => run.name !== context.action );
 
         // no checks besides self, wait for something
         if (!filtered.length) {
