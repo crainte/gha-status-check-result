@@ -8874,7 +8874,6 @@ function up() {
     return giphy('thumbs-up');
 }
 function down() {
-    core.setFailed('Failed');
     return giphy('thumbs-down');
 }
 function giphy(tag) {
@@ -8898,9 +8897,9 @@ waitForResult
     .then((event) => {
         switch(event) {
             case "timeout":
-                return down();
+                return down().then(() => { Promise.reject(); });
             case "failure":
-                return down();
+                return down().then(() => { Promise.reject(); });
             case "success":
                 return up();
         }
