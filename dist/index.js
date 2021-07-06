@@ -8874,6 +8874,7 @@ function up() {
     return giphy('thumbs-up');
 }
 function down() {
+    core.setFailed('Failed');
     return giphy('thumbs-down');
 }
 function giphy(tag) {
@@ -8905,15 +8906,12 @@ waitForResult
         }
     })
     .then(result => {
-        core.debug(`final result: ${result}`);
         return result;
     })
     .then(() => {
-        core.debug('final then');
         process.exit(0);
     })
     .catch(e => {
-        core.debug('caught');
         process.exit(1);
     });
 
