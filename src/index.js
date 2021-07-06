@@ -190,7 +190,6 @@ function down() {
     return giphy('thumbs-down');
 }
 function giphy(tag) {
-    // nothing at all
     return getGif(tag)
         .then(gif => {
             return gif.data.data;
