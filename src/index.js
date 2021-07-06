@@ -38,8 +38,6 @@ const waitForResult = new Promise((resolve, reject) => {
 async function monitorAll() {
 
     while ( true ) {
-        core.info(`Sleeping ${interval} ms`);
-        await new Promise(r => setTimeout(r, interval));
 
         reqChecks()
             .then(result => {
@@ -48,6 +46,7 @@ async function monitorAll() {
                     bus.emit('success', {message: 'success'});
                 }
             });
+
         reqStatus()
             .then(result => {
                 status_pending = result;
@@ -55,6 +54,9 @@ async function monitorAll() {
                     bus.emit('success', {message: 'success'});
                 }
             });
+
+        core.info(`Sleeping ${interval} ms`);
+        await new Promise(r => setTimeout(r, interval));
     }
 }
 
