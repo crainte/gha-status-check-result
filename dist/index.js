@@ -8732,6 +8732,15 @@ async function monitorAll() {
     }
 }
 
+function checkSuccess() {
+    if ( typeof status_pending !== 'undefined' && 
+         typeof checks_pending !== 'undefined' &&
+        !status_pending &&
+        !checks_pending ) {
+        bus.emit('success', {message: 'success'});
+    }
+}
+
 async function reqChecks() {
     try {
         core.debug("Requesting Checks");
@@ -8748,6 +8757,7 @@ async function reqChecks() {
             run => run.status === "completed" && run.conclusion === "failure"
         );
         if (failed.length) bus.emit('failure', {message: 'Failure detected'});
+        bus.emit('failure', {message: 'Failure detected'});
 
         const pending = filtered.filter(
             run => run.status === "queued" || run.status === "in_progress"
@@ -8762,10 +8772,7 @@ async function reqChecks() {
         core.error(error);
         bus.emit('failure', {message: 'Failure in processing'});
     }
-
-    if ( typeof status_pending !== 'undefined' && !status_pending ) {
-        bus.emit('success', {message: 'success'});
-    }
+    checkSuccess();
     core.debug("Made it to the end of Checks");
     checks_pending = 0;
     return;
@@ -8794,7 +8801,6 @@ async function reqStatus() {
             run => run.state === "failure"
         );
         if (failed.length) bus.emit('failure', {message: 'Failure detected'});
-        bus.emit('failure', {message: 'Failure detected'});
 
         const pending = filtered.filter(
             run => run.state === "pending"
@@ -8810,9 +8816,7 @@ async function reqStatus() {
         bus.emit('failure', {message: 'Failure in processing'});
     }
 
-    if ( typeof checks_pending !== 'undefined' && !checks_pending ) {
-            bus.emit('success', {message: 'success'});
-    }
+    checkSuccess();
     core.debug("Made it to the end of Status");
     status_pending = 0;
     return;
