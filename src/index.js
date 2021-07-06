@@ -212,20 +212,23 @@ waitForResult
     .then((event) => {
         switch(event) {
             case "timeout":
-                return down() && Promise.reject();
+                return down();
             case "failure":
-                return down() && Promise.reject();
+                return down();
             case "success":
                 return up();
         }
     })
     .then(result => {
+        core.debug(`final result: ${result}`);
         return result;
     })
     .then(() => {
+        core.debug('final then');
         process.exit(0);
     })
     .catch(e => {
+        core.debug('caught');
         process.exit(1);
     });
 
