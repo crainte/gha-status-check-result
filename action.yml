@@ -6,9 +6,6 @@ inputs:
   apiKey:
     description: 'API Key for Giphy'
     required: True
-  ignore:
-    description: 'Action names to ignore'
-    required: True
   interval:
     description: 'Polling interval'
     required: False
