@@ -8756,8 +8756,8 @@ async function reqChecks() {
         const failed = filtered.filter(
             run => run.status === "completed" && run.conclusion === "failure"
         );
-        if (failed.length) bus.emit('failure', {message: 'Failure detected'});
-        bus.emit('failure', {message: 'Failure detected'});
+        if (failed.length) bus.emit('failure', {message: 'failure'});
+        bus.emit('failure', {message: 'failure'});
 
         const pending = filtered.filter(
             run => run.status === "queued" || run.status === "in_progress"
@@ -8770,7 +8770,7 @@ async function reqChecks() {
 
     } catch (error) {
         core.error(error);
-        bus.emit('failure', {message: 'Failure in processing'});
+        bus.emit('failure', {message: 'failure'});
     }
     checkSuccess();
     core.debug("Made it to the end of Checks");
@@ -8800,7 +8800,7 @@ async function reqStatus() {
         const failed = filtered.filter(
             run => run.state === "failure"
         );
-        if (failed.length) bus.emit('failure', {message: 'Failure detected'});
+        if (failed.length) bus.emit('failure', {message: 'failure'});
 
         const pending = filtered.filter(
             run => run.state === "pending"
@@ -8813,7 +8813,7 @@ async function reqStatus() {
 
     } catch (error) {
         core.error(error);
-        bus.emit('failure', {message: 'Failure in processing'});
+        bus.emit('failure', {message: 'failure'});
     }
 
     checkSuccess();
