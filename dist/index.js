@@ -8747,6 +8747,8 @@ async function reqChecks() {
         const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.payload.pull_request.head.sha}/check-runs`);
         const filtered = response.data.check_runs.filter( run => run.name !== context.job );
 
+        core.debug(util.inspect(response.data));
+
         // no checks besides self, wait for something
         if (!filtered.length) {
             core.info("No checks worth watching");
@@ -8790,6 +8792,8 @@ async function reqStatus() {
         } else {
             filtered = response.data;
         }
+
+        core.debug(util.inspect(response.data));
 
         if (!filtered.length) {
             core.info("No status worth watching");
