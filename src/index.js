@@ -9,7 +9,6 @@ const apiKey = core.getInput('apiKey');
 const rating = core.getInput('rating') || "pg-13";
 const timeout = parseInt(core.getInput('timeout')) || 30000;
 const interval = parseInt(core.getInput('interval')) || 5000;
-const ctx = core.getInput('context') || null;
 
 const bus = new events();
 const octokit = github.getOctokit(token);
@@ -48,7 +47,7 @@ async function monitorAll() {
 }
 
 function checkSuccess() {
-    if ( typeof status_pending !== 'undefined' && 
+    if ( typeof status_pending !== 'undefined' &&
          typeof checks_pending !== 'undefined' &&
         !status_pending &&
         !checks_pending ) {
@@ -99,14 +98,18 @@ async function reqStatus() {
         core.debug("Requesting Status");
         const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.payload.pull_request.head.sha}/statuses`);
 
-        if (ctx) {
-            // we are looking for a specific context
-            filtered = response.data.filter(
-                run => run.context === ctx
-            );
-        } else {
-            filtered = response.data;
-        }
+        filtered = response.data.reduce((acc, item) => {
+            if( acc.some( i => i.context === item.context )) {
+                source = acc.find( i => i.context === item.context);
+                if( source.updated_at < item.updated_at ) {
+                    acc.splice(acc.indexOf(source), 1);
+                    acc.push(item);
+                }
+            } else {
+                acc.push(item);
+            }
+            return acc;
+        }, []);
 
         core.debug(util.inspect(response.data));
 
