@@ -98,6 +98,8 @@ async function reqStatus() {
         core.debug("Requesting Status");
         const response = await octokit.request(`GET ${context.payload.repository.url}/commits/${context.payload.pull_request.head.sha}/statuses`);
 
+        core.debug(util.inspect(response.data));
+
         filtered = response.data.reduce((acc, item) => {
             if( acc.some( i => i.context === item.context )) {
                 source = acc.find( i => i.context === item.context);
@@ -111,7 +113,7 @@ async function reqStatus() {
             return acc;
         }, []);
 
-        core.debug(util.inspect(response.data));
+        core.debug(util.inspect(filtered));
 
         if (!filtered.length) {
             core.info("No status worth watching");
