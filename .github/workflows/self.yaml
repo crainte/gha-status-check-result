@@ -18,10 +18,6 @@ jobs:
   scan:
     runs-on: ubuntu-latest
     steps:
-      - name: mkdir
-        run: |
-          mkdir -p /github/workspace
-          chown -R $(id -u):$(id -g) /github
       - uses: actions/checkout@v3
       - uses: max/secret-scan@master
 
